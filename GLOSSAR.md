@@ -149,22 +149,33 @@ Diese Begriffe haben **zwei Bedeutungen** — Kontext entscheidet:
 
 | Begriff | Bedeutung | Kurzerklärung & Kontext |
 |---|---|---|
+| Arbeitsverzeichnis | Working Directory | Ordner, in dem R Dateien sucht und speichert; mit `getwd()` abfragbar; im RStudio-Projekt = Projektordner; KM7-04 |
+| Batch-Ausführung | Batch Mode | Ein Skript komplett und ohne Interaktion ausführen; in R per `Rscript`; KM7-05 |
 | CDN | Content Delivery Network | reveal.js-Folien laden Bibliotheken via CDN — keine lokale Installation nötig |
 | CRAN | Comprehensive R Archive Network | Offizielles Paket-Repository für R |
 | d/p/q/r | density / probability / quantile / random | R-Funktionsfamilien für Verteilungen (`dnorm`, `pnorm`, `qnorm`, `rnorm`, …); UE 4 (KM7, 4HWIT WS) |
 | choose / dbinom / pbinom | — | `choose(n,k)` Koeffizient · `dbinom(k,n,p)` genau k · `pbinom(k,n,p)` höchstens k; UE 4 (KM5-Wiederholung, `KM5-01`) |
 | data frame | — | Tabellarische Datenstruktur in R (Zeilen = Beobachtungen, Spalten = Variablen) |
 | DSL | Domain-Specific Language | Interne Mini-Sprachen in R (Formel-Interface `y ~ x`, ggplot2, dplyr) — via NSE umgesetzt |
+| Exit-Code | Exit Status | Rückgabewert eines Programms an die Shell (0 = Erfolg, sonst Fehler); Automatisierungen entscheiden danach über Erfolg/Misserfolg; KM7-05 |
 | ggplot2 | — | Visualisierungspaket nach Grammar of Graphics; UE 1 (KM7, 4HWIT WS) |
 | Grammar of Graphics | — | Schichten-Logik hinter ggplot2: Daten + `aes` + `geom` + stats/scales/facets |
+| IDE | Integrated Development Environment | Programmier-Oberfläche zum Schreiben und Ausführen von Code; RStudio ist die R-IDE; KM7-04 |
 | ISLR | An Introduction to Statistical Learning (Buch) | Weiterführende Lektüre (statlearning.com), frei verfügbar |
 | LSR | Learning Statistics with R (Navarro) | Freie Statistik-Lektüre; Anker für Verteilungen/Tests (Kap. 9–16) |
 | ML | Machine Learning | Bewusst **out of scope** (siehe `selbststudium/MISSION.md`) |
 | NSE | Non-Standard Evaluation | Auswertungstrick hinter dplyr & Co. (Ausdrücke werden im Daten-Kontext evaluiert) |
 | palmerpenguins | — | Pinguin-Datensatz (344 Zeilen, 3 Arten) für UE 1–2 und UE 4 (KM7, 4HWIT WS); Lizenz CC0 |
 | Pipe | `%>%` bzw. `\|>` | Verkettet Operationen lesbar von links nach rechts; UE 2 (KM7, 4HWIT WS) |
+| R-Projekt | `.Rproj` | Ordner mit Projektdatei `<name>.Rproj`; Doppelklick öffnet RStudio mit festgelegtem Arbeitsverzeichnis; KM7-04 |
+| R-Skript | — | Datei (`*.R`) mit R-Befehlen, gespeichert und wiederholbar ausführbar (`Ctrl + Enter`); KM7-04 |
 | R4DS | R for Data Science (Wickham, Çetinkaya-Rundel, Grolemund; 2e) | Hauptlektüre der Toolchain; r4ds.hadley.nz; UE 1–3 (KM7, 4HWIT WS) |
-| RStudio | — | IDE für R (Posit) |
+| REPL | Read-Eval-Print-Loop | Interaktive R-Konsole (Prompt `>`): Ausdruck eingeben, Enter, R wertet aus und druckt; KM7-05 |
+| Rscript | — | Batch-Läufer von R: liest eine `.R`-Datei komplett aus (frische Session, kein Prompt) und beendet sich; Exit-Code signalisiert Erfolg/Fehler; KM7-05 |
+| RStudio | — | IDE für R (Posit); Oberfläche zu R — „erst R, dann RStudio"; KM7-04 |
+| Shebang | `#!` | Erste Skript-Zeile (`#!/usr/bin/env Rscript`); sagt Linux/macOS, womit die Datei auszuführen ist (nach `chmod +x`); KM7-05 |
+| Terminal | — | Kommandozeile des Betriebssystems (in RStudio als Tab); startet Programme wie `Rscript` — die Console ist das R-REPL, nicht das Terminal; KM7-05 |
+| snake_case | — | Namenskonvention: Kleinbuchstaben mit `_` (`mittel_wert`); KM7-04 |
 | tibble | — | Moderner data frame im tidyverse |
 | tidyverse | — | Paketsammlung (ggplot2, dplyr, readr, tidyr, …); UE 1–3 (KM7, 4HWIT WS) |
 | Whole Game | — | R4DS-Didaktik: erst das ganze Spiel erleben (Visualisierung!), dann Details; unser UE-1–3-Prinzip (KM7, 4HWIT WS) |
@@ -189,7 +200,7 @@ Diese Begriffe haben **zwei Bedeutungen** — Kontext entscheidet:
 | GRG-PMM | — | Dieses Repository (Unterrichtsmaterial, öffentlich) |
 | GRG-PMM-T | — | Test-Repository (privat) mit Prüfungsangaben |
 | JG3-Track | — | Georgs Selbststudium-Pfad durch KM5/KM6; `selbststudium/reference/jg3-verlauf.html` |
-| L0003 … | — | Lektions-Nummern im Selbststudium (`selbststudium/prepared-lessons/`) |
+| L03 … | — | Lektions-Nummern im Selbststudium (`selbststudium/prepared-lessons/`) |
 | Lern-Lektion | — | Interaktive HTML-Lektion für Georg (teach skill), Artefakt 1 von 3 pro UE |
 | LR | Learning Record | Lernprotokoll nach jeder Selbststudium-Einheit — ⚠ Kollision, s.o. |
 | Matrix-Key | — | Slug je Lehrplan-Thema in `lehrplan/ressourcen-matrix.md` (z.B. `KM7-tests`) |

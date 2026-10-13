@@ -2,6 +2,21 @@
 
 ## Open Tasks
 
+### 5ahwit: `## Hausaufgaben` verweist auf fehlende Ablage
+**Priority:** low
+**Context:** `5ahwit/README.md` Sektion `## Hausaufgaben` verweist auf
+`hausaufgaben/` („Kohorten-Kopien der Master-HAs") — der Ordner existiert
+nicht. Festgestellt bei Homework-Discovery 2026-10-12.
+**Action:** Ablage anlegen (Kopien aus `unterricht/SA-0N-*/hausaufgabe.md`)
+oder Verweis aus dem README entfernen.
+
+### Wissensüberprüfung 4AHWIT-x am 2026-10-13 (GRG-PMM-T #4)
+**Priority:** high (Prüfung ist morgen)
+**Context:** Erste WÜ der Kohorte x: 25 MC + 3 Freitext (145 P) — Setup,
+SA-00, R-Basics, ggplot (Selbststudium), Git. Dateien committed in
+`GRG-PMM-T/4ahwit-x/`. Grundlage war der korrigierte README-Verlauf (#31).
+**Action:** Nach der Prüfung: ggf. Anpassungen, dann GRG-PMM-T #4 schließen.
+
 ### Andere Repos auf die neue lehrplan-Ordnung ziehen (opencode-helpers #92)
 **Priority:** medium
 **Context:** Der `lehrplan`-Skill (opencode-helpers #92) verlangt jetzt
@@ -36,12 +51,25 @@ KM6-Lücken Bonus-UE aktivieren.
 
 ### JG3-Lern-Tracks (Phase 0) fortsetzen
 **Priority:** high
-**Context:** Georg lernt JG3-Vorwissen (KM5+KM6) selbst. Track 1 L0003
-abgeschlossen; L0004 gebaut+committet. KM7-Anschluss: `reference/km7-verlauf.html`.
-**Action:** L0004 durcharbeiten (teach-Session; Binomial/Hypergeometrisch/
-Poisson), mit LR dokumentieren; danach L0005 bauen.
+**Context:** Georg lernt JG3-Vorwissen (KM5+KM6) selbst. Track 1 L03 ✅,
+L04 Binomial ✅ + Hypergeometrisch ✅ (LR 08/09); Poisson offen.
+Didaktik-Präferenzen: kleine Häppchen, komplette Angabe bei jeder
+Wiederholung, keine neuen Begriffe ungeklärt in Aufgaben, kein LaTeX im
+Chat (teach-Skill).
+**Action:** L04 Abschnitt 3 (Poisson) teachen — Einstieg über „Ereignisse
+pro Einheit statt Stücke pro Los"; LR schreiben, `jg3-verlauf.html`
+auf ✅; danach L05 bauen.
 
 ## Erledigt (dieser Zyklus)
+- **GRG-PMM #32:** neue Prepared Lesson `KM7-05` „Rscript und die
+  Kommandozeile" (Terminal, frische Session, `commandArgs()`, Exit-Code,
+  Shebang; Callout „Exit-Code ≠ korrektes Ergebnis"); Navigator + Glossar
+  nachgezogen; Code per `Rscript` verifiziert. Kein Fenster-Recap — das
+  bleibt in KM7-04. Commit `9a37080`.
+- **GRG-PMM #29:** neue Prepared Lesson `KM7-04` „RStudio, Projektordner
+  und R-Skripte" (kohortenagnostisch, Werkzeug-/Workflow-Grundlage zu KM7,
+  verwandt mit SA-00); `index.html`-Navigator + Glossar nachgezogen;
+  Code gegen `assets/betriebsdaten.csv` per `Rscript` verifiziert.
 - **opencode-helpers #92:** lehrplan-Skill auf Fach-/Zweig-Ebene umgebaut —
   Fach-Ebene am Root (inkl. KM-keyed Ressourcen), Planung in
   `<fach>-<zweig>/`, `unterricht/` ohne Zweig-Fach-Ordner, WMC-Ausnahme

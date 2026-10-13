@@ -115,6 +115,20 @@ teach-skill lesson quizzes (`quiz.js`, single-correct) in `selbststudium/`.
   Klassen-Lektionen). Kohorten-spezifische Aufhol-/Recap-Lektionen dürfen
   direkt in der Zielkohorte entstehen (im README kennzeichnen).
 
+## Lernplattform (GitHub Pages, #27, 2026-10-05)
+- GitHub Pages ist die **Lernplattform**: veröffentlicht wird **nur `unterricht/`**
+  (+ zentrales `assets/` + Navigator `index.html`) über
+  `.github/workflows/pages.yml` (rsync). Kohorten-Ordner (`4ahwit-*`, `5ahwit`),
+  `selbststudium/`, `lehrplan/`, `Unterlagen/` usw. werden **nicht** deployt.
+- Der Root-`index.html` verlinkt ausschließlich `unterricht/`-Lessons (Block je
+  `KM<#>`/`SA`). Neue Lessons werden im selben Commit dort eingetragen.
+- **README-Top-Link (#28, 2026-10-06):** Jedes Unterrichtsrepo verlinkt die
+  Lernplattform ganz oben im Projekt-`README.md` als Blockquote
+  `> **Lernplattform (GitHub Pages):** <URL> — veröffentlicht werden nur die
+  vorbereiteten Lektionen aus [\`unterricht/\`](./unterricht/) …` (Stil GRG-SWP/
+  GRG-WMC; GRG-INFI nutzt eine kompaktere Variante). Gilt repo-übergreifend
+  für alle Unterrichtsrepos, nicht nur GRG-PMM.
+
 ## Shared Assets & HTML-Bootstrap (#19, 2026-09-27)
 - **Genau ein** Top-Level-Ordner `assets/` im Repo. Keine eigenen
   `assets/`-Ordner in Kohorten/Workspaces mehr; CSS, JS und Datensätze
@@ -131,5 +145,22 @@ teach-skill lesson quizzes (`quiz.js`, single-correct) in `selbststudium/`.
   GitHub Pages — **kein `file://`** (Firefox blockiert `file://`-Subressourcen
   aus Eltern-/Geschwisterverzeichnissen; siehe PITFALLS).
 - Quiz-Markup ist vereinheitlicht: `<div class="quiz" data-loesung="N">` mit
-  `input[type=radio]`, `.feedback`, `.erklaerung` (richtig) und optional
-  `.hinweis` (falsch) — ein `assets/quiz.js` für Klassen und Selbststudium.
+  `input[type=radio]` (0-basierte `value`), je Option `data-grund` und
+  `<p class="feedback" aria-live="polite">`. `assets/quiz.js` zeigt beim
+  `change` sofort die Begründung der gewählten Option und färbt `.feedback`
+  mit `.richtig`/`.falsch` — ein Skript für Klassen und Selbststudium.
+- Initialisierung in über `loader.js` geladenen Skripten (`quiz.js`,
+  `theme.js`, …) läuft über einen **`readyState`-Guard**, nicht über einen
+  bloßen `DOMContentLoaded`-Listener:
+  `if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", start); } else { start(); }`
+  — der Loader injiziert die Skripte asynchron nach dem Parsen (siehe PITFALLS).
+
+## Folien / reveal.js (#30)
+- **Layout zentral in `assets/slides.css`**, nie pro `praesentation.html`.
+  Die Datei hält Grundschrift (32px) und Lesemaß
+  (`--pmm-slide-measure`, 1000px, zentriert, Print-Reset `max-width: none`).
+- Jede `praesentation.html` setzt nur noch Inhalt + `Reveal.initialize({…
+  width: 1280, height: 800 …})` und lädt `slides.css` über den Loader.
+- Zielbild: schmaler, zentrierter Satzspiegel wie `lesson.html` — keine
+  randfüllende Breite. Solche Änderungen immer gegen `height` 800 prüfen
+  (reveal schrumpft nicht, siehe PITFALLS).

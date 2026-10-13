@@ -1,8 +1,14 @@
 # Project State
 
-Current status as of 2026-09-29.
+Current status as of 2026-10-13.
 
 ## Current Focus
+**Lernplattform (#27):** GitHub Pages liefert nur noch `index.html`, `assets/`
+und `unterricht/` (`.github/workflows/pages.yml`, umgestellt von legacy
+Branch-Deploy); Kohorten (`4ahwit-*`, `5ahwit`), `selbststudium/` und
+`lehrplan/` sind raus. Der Navigator `index.html` listet jetzt alle
+`unterricht/`-Lessons (SA + KM5–KM7) und keine Kohorten-/Lehrplan-Links mehr.
+
 **lehrplan Fach-/Zweig-Ebene (#21):** Das `lehrplan/`-Root trägt die
 Fach-Ebene (`METADATA.md`, `RIS/`, `kompetenzmodule/`, `ressourcen-matrix.md`,
 `r4ds-abdeckung.md` — formunabhängig); die Zweig-Ebene `lehrplan/pmm-hwit/`
@@ -15,6 +21,47 @@ opencode-helpers (#92) entsprechend umgebaut (Fach-Ebene vs. Zweig-Ebene,
 unterricht ohne Zweig-Fach-Ordner).
 
 ## Completed (this cycle)
+- [x] #32 CLOSED 2026-10-13 — Lesson `KM7-05` (Rscript & Kommandozeile): neue
+      Prepared Lesson unter `unterricht/KM7-05-rscript-und-kommandozeile/` —
+      Lektion = Präsentation, 7 Quizfragen (Rotation 2/0/3/1/2/0/3),
+      7 Schritte (Console vs. Terminal, Rscript, frische Session, `-e`,
+      `commandArgs()`, Exit-Code, Shebang), Callout „Exit-Code ≠ korrektes
+      Ergebnis"; Navigator + 6 Glossar-Begriffe nachgezogen, Code per
+      `Rscript` verifiziert. Bewusst kein Fenster-Recap (steht in KM7-04).
+- [x] 2026-10-12 — Homework-Discovery PMM (PMMx/PMMy/PMM): README-Retrofit
+      `## Aufgaben` (erste Sektion) in `4ahwit-x/` (2 Einträge: HÜ-Kontrolle
+      22.9., SA-01 Selbststudium 6.10. → Index-Link auf
+      `unterricht/SA-01-datenvisualisierung-ggplot/`), `4ahwit-y/` (4 Einträge:
+      18.9. Repo-Anlage, 25.9. Betriebsdaten, 2.10. sd/var+n−1, 9.10.
+      OpenCode-Prompt) und `5ahwit/` (2 Einträge: Setup-HÜ 23.9. — Evidenz
+      `wiederholungswuensche.md`, KM7-02 Chi-Quadrat 30.9.). Neue
+      `Aufgabe.md` in `4ahwit-y/20206-10-09_opencode/` (PROMPT.md/ANSWER.md);
+      legacy `hausaufgabe.md` in `5ahwit/2026-09-30-chi-quadrat-test/`
+      vollständig belassen. Generierte Aufgabe-Dateien bewusst
+      **uncommitted** zur Review.
+- [x] #30 CLOSED 2026-10-06 — Folien-Layout: `assets/slides.css` gibt den
+      reveal.js-Folien einen schmalen, zentrierten Satzspiegel
+      (`--pmm-slide-measure: 1000px`, Grundschrift 32px) wie die
+      `lesson.html`-Seiten; alle 11 Präsentationen + Kohorten-Kopie headless
+      gegen die 800px-Canvas-Höhe geprüft (max. 778px, keine Kürzung).
+- [x] #29 CLOSED 2026-10-06 — Lesson `KM7-04` (RStudio, Projektordner, R-Skripte): neue
+      Prepared Lesson (kohortenagnostisch) unter
+      `unterricht/KM7-04-rstudio-projekt-und-skript/` — Lektion =
+      Präsentation, 5 Quizfragen, Lektüre R4DS Kap. 2 + 6; Navigator-
+      Eintrag + Glossar-Begriffe nachgezogen, Code per `Rscript` verifiziert.
+- [x] #28 CLOSED 2026-10-06 — Lernplattform-Link (GitHub Pages) ganz oben ins
+      `README.md` (SWP/WMC-Stil); Konvention repo-übergreifend in
+      `CONVENTIONS.md` festgehalten.
+- [x] #27 CLOSED 2026-10-05 — GitHub Pages als Lernplattform: neuer
+      `pages.yml` (rsync von `index.html assets unterricht`, legacy
+      Branch-Deploy abgelöst), `index.html` auf alle `unterricht/`-Lessons
+      umgebaut (SA + KM5–KM7), keine Kohorten-/Lehrplan-Links; README/AGENTS/
+      CONVENTIONS nachgezogen
+- [x] #24 Quiz-Feedback reparieren: `assets/quiz.js` + `assets/theme.js` mit
+      `readyState`-Guard (Loader injiziert die Assets asynchron nach
+      `DOMContentLoaded`); `CONVENTIONS.md`-Drift (`.erklaerung`/`.hinweis`
+      → `data-grund`/`.feedback`) behoben. Verifiziert per headless Chrome;
+      Schwester-Fix in GRG-WMC (#6).
 - [x] #21 lehrplan-Umbau: Fach-Ebene (Root) vs. Zweig-Ebene (`pmm-hwit/`);
       `unterricht/HWIT-PMM/` entfernt, Semesterpläne nach `lehrplan/pmm-hwit/`,
       JG3-Semesterpläne angelegt, Pfad-Referenzen + Doku (AGENTS/README/GLOSSAR/
@@ -36,18 +83,26 @@ unterricht ohne Zweig-Fach-Ordner).
       Badge, `prepared-lessons/`, Live-Server/GitHub Pages.
 
 ## Pending
+- [ ] **Wissensüberprüfung 4AHWIT-x am 2026-10-13** (GRG-PMM-T #4): Exam + Lösungen committed; nach Prüfung reviewen/schließen.
 - [ ] **SA-01–SA-03 inhaltlich auf 90 min vertiefen** (Teil der Überarbeitung).
 - [ ] **Einstiegstest 4HWIT** korrigieren → Bonus-UE bzw. UE 4–5 anpassen.
 - [ ] **Einstiegstest 5HWIT**: DOE-Block + Umwelt-Vorwissen auswerten.
 - [ ] **R/RStudio auf Schul-Laptops der 5AHWIT bestätigen.**
-- [ ] JG3 Phase 0: L0004 durcharbeiten (teach-Session), danach L0005+.
+- [ ] JG3 Phase 0: L04 Abschnitt 3 (Poisson) durcharbeiten, dann L04 ✅; danach L05+.
 
 ## Notes
+- 2026-10-12: Ordnername `4ahwit-y/20206-10-09_opencode/` enthält einen
+  Datumstippfehler (`20206` statt `2026`) — bewusst **nicht** umbenannt
+  (README-Verlauf + Aufgabe.md verweisen darauf); Pitfall siehe PITFALLS.md.
+  `5ahwit/README.md` Sektion `## Hausaufgaben` verweist auf eine
+  `hausaufgaben/`-Ablage, die (noch) nicht existiert — Klärung offen.
 - R 4.5.x mit `tidyverse`, `palmerpenguins`; Verifikation per `Rscript`
-  (Arbeitsverzeichnis = Repo-Root). Betriebsdaten `assets/betriebsdaten.csv`.
+  (Arbeitsverzeichnis = Repo-Root). Betriebsdaten `assets/betriebsdaten.csv`
+  (nur M3 hat Ausschuss: 4 von 40 bei ±0,15 mm — M1/M2 sauber; KM5-02s
+  „6 von 40" ist ein Szenario, nicht die CSV).
 - Nutzung: `./serve.sh` → `http://localhost:8000/`; **kein `file://`** (Firefox).
 - Web-Assets: ein Top-Level `assets/`; Bootstrap + Badge generisch (CONVENTIONS).
 
 ## Next Session Suggestion
-SA-01–SA-03 auf 90 min vertiefen; JG3-Semesterplan-Lektionen (0005–0015)
-bauen; nächste Lektion on demand (z. B. UE 5 Konfidenzintervalle).
+JG3: L04 Abschnitt 3 (Poisson) teachen; SA-01–SA-03 auf 90 min vertiefen;
+JG3-Semesterplan-Lektionen (05–15) bauen.

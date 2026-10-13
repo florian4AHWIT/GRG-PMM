@@ -33,7 +33,7 @@ This repository contains coursework for **Prozessmanagement (PMM)** at HTL Speng
   - During curriculum preparation (before teaching dates are known):
     `unterricht/<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul, `SA` =
     schulautonom; `<NN>` runs per KM) with `lesson.html`; selbststudium keeps
-    its four-digit `prepared-lessons/`. Dated lessons live in the date folder
+    its two-digit `prepared-lessons/`. Dated lessons live in the date folder
     as `lesson.html`.
 - Lowercase with hyphens for multi-word names
 - ISO 8601 date prefix for all dated documents
@@ -47,6 +47,11 @@ This repository contains coursework for **Prozessmanagement (PMM)** at HTL Speng
 - Use the **live server** (`./serve.sh`), not `file://`: Firefox's
   `security.fileuri.strict_origin_policy` blocks cross-directory subresources
   under `file://` (slashes, not dots, are the reason central assets work).
+- **GitHub Pages = Lernplattform:** veröffentlicht wird nur `index.html`,
+  `assets/` und `unterricht/` (`.github/workflows/pages.yml`); Kohorten- und
+  Planungsordner werden nicht deployt. Der Root-`index.html` verlinkt
+  ausschließlich `unterricht/`-Lessons und wird bei jeder neuen Lesson
+  mitgepflegt.
 - All non-asset links stay **relative**; do not use `<base>` or root-absolute
   asset paths.
 
@@ -112,7 +117,7 @@ user wants to learn R, statistics, or any PMM-relevant topic.
 - `selbststudium/MISSION.md` defines the learning goal (R + statistics for teaching PMM)
 - `selbststudium/RESOURCES.md` lists curated courses, books, and communities
 - `selbststudium/learning-records/` tracks progress across sessions
-- `selbststudium/prepared-lessons/` contains generated interactive HTML lessons (four-digit numbering)
+- `selbststudium/prepared-lessons/` contains generated interactive HTML lessons (two-digit numbering)
 
 ## 10. Klassen-Lektionen (Create-Lesson-Skill)
 
@@ -132,8 +137,9 @@ user wants to learn R, statistics, or any PMM-relevant topic.
   so viele wie nötig (nicht mehr 1–5 gedeckelt); Richtige-Positionen rotieren.
 - Jede Lektion nutzt die **gemeinsamen Assets** unter `assets/` (Bootstrap +
   Badge), keine eigenen `assets/`-Ordner.
-- Selbststudium-Bestand (`selbststudium/prepared-lessons/`, vierstellig) bleibt
-  unangetastet — eigene fortlaufende Zählung mit Querverweisen.
+- Selbststudium-Bestand (`selbststudium/prepared-lessons/`, `learning-records/`)
+  ist **zweistellig** nummeriert (`01`–`99`) — eigene fortlaufende Zählung mit
+  Querverweisen; bei Erreichen der Grenze (100) erneuter Umbau.
 
 ## Knowledge Bootstrap
 Before starting any task, read the following files in order:

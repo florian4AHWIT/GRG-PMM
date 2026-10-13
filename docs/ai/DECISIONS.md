@@ -3,6 +3,42 @@
 Architectural and technical decisions made in this project.
 Each entry documents WHAT was decided and WHY.
 
+## 2026-10-12: Knowledge-Checks ins private T-Repo (`GRG-PMM-T`), nicht ins Unterrichts-Repo (#31)
+
+- **Choice:** Exam- und Lösungsdateien gehören in das private
+  Schwester-Repo `GRG-PMM-T` (Ablage: flach im Klassenordner, z. B.
+  `4ahwit-x/knowledge_4ahwit-x_2026-10-13.md` + `_solutions.md`), niemals
+  in das öffentliche Unterrichts-Repo. Umgesetzt im `knowledge-exam`-Skill
+  (opencode-helpers `e8813e6`): Ziel-Repo-Resolution + Up-to-date-Check +
+  Pflichtlektüre der AGENTS.md des T-Repos.
+- **Reason:** Die `-T`-Repos sind Georgs private Prüfungs-Repos (Konvention
+  über alle Fächer: `GRG-INFI-T`, `GRG-JAVA-T`, `GRG-SWP-T`, …); im
+  Unterrichts-Repo wären Lösungen faktisch öffentlich (GitHub Pages).
+- **Tradeoff:** Der `knowledge-exam`-Skill verlangt seitdem keine Commits
+  der generierten Dateien, aber Georg kann sie im T-Repo direkt committen.
+
+## 2026-10-04: create-lesson kohortenagnostisch — Thema→KM tragend, UE optional (#26)
+
+- **Choice:** Lessons gehören zu einem **Thema, das einen Teil eines KM
+  deckt** — nicht zu einer Kohorte oder fest geplanten UE. Kopfzeile ohne
+  Klasse/Semester/UE; Bestellformat nur `KM + Thema` (UE/Kohorte optionaler
+  Kontext); keine Lessons-Tabellen in Klassen-READMEs, kein Kohorten-
+  Lernfortschritt im Skill. Übernahme bleibt manuell: Lehrperson kopiert
+  zur Tagesdynamik in den Kohortenordner und setzt das Datum selbst in den
+  Ordnernamen. Umgesetzt im Skill (opencode-helpers #100), erste Lesson
+  danach gebaut: `unterricht/KM5-03-ziehen-ohne-zuruecklegen/`.
+- **Reason:** Die Direktzuordnung Lesson↔UE ist angesichts der
+  Unterrichtsdynamik „völlig lächerlich" (Georg); der Skill mischte sich
+  in Kohorten-Lernfortschritt, der allein die Lehrperson betrifft.
+- **Konvention:** KM5-03 ist bewusst kohortenfrei gebaut — Übernahme in
+  4AHWIT/5AHWIT/was auch immer entscheidet die Tagesdynamik.
+
+## 2026-10-04: Selbststudium-Nummerierung auf zweistellig umgestellt
+
+- **Choice:** Der Selbststudium-Bestand (`selbststudium/prepared-lessons/`, `learning-records/`) wird von vierstellig auf **zweistellig** (`01`–`99`) umgestellt. Umbenannt: 4 Lektionen (`01`–`04`) und 8 Learning Records (`01`–`08`); alle Querverweise (`jg3`/`km7-verlauf.html`, Lektions-Nav, `index.html`, `MISSION.md`, `NOTES.md`, JG3-Semesterpläne, Glossar, `docs/ai`) mitgezogen. Damit ist die Grandfather-Klausel für vierstelliges Selbststudium (Eintrag 2026-09-23) aufgehoben.
+- **Reason:** Georg wünscht „höchstens zweistellige Zahlen" für die Selbststudium-Nummerierung; die vierstellige Form war reiner Kollisionsschutz und für einen Pfad < 100 nicht nötig.
+- **Tradeoff:** Die Querverweise mussten einmalig nachgezogen werden (bewusste Ausnahme von „never rename a running sequence"). Kohorten-`teach/`-Workspaces (z. B. `5ahwit/teach/`) behalten ihre eigene Nummerierung unverändert.
+
 ## 2026-09-29: lehrplan pro Fach-Zweig (`pmm-hwit/`), KM-Steckbriefe auf Fach-Ebene, unterricht entschlackt (#21)
 
 - **Choice (Fach-Ebene):** Das `lehrplan/`-Root trägt das Formunabhängige: `METADATA.md`, `RIS/`, `kompetenzmodule/` (km3–km9b) und die KM-keyed Ressourcen `ressourcen-matrix.md`/`r4ds-abdeckung.md`. Damit ist die flache Ablage aus #19 aufgehoben.
@@ -107,7 +143,8 @@ Each entry documents WHAT was decided and WHY.
   Wiederholung aus KMx]`), zweistellige Dateien `NN-slug.html` pro
   Schuljahr pro Klasse. `teach`-Skill (global + projektlokal) schreibt
   Zweistelligkeit für Klassen-Material vor; Selbststudium-Bestand bleibt
-  vierstellig (Grandfather-Klausel, Querverweise intakt). GRG-PMM-Instanz:
+  vierstellig (Grandfather-Klausel, Querverweise intakt). *(Superseded
+  2026-10-04: Selbststudium jetzt ebenfalls zweistellig.)* GRG-PMM-Instanz:
   9 Lessons umbenannt (01–03), Lessons-Tabellen in allen Klassen-READMEs
   (Bestellzettel: Nr./Ziel-UE/Quelle/Typ/Quiz/Status), UE-4+-Anker in
   RESOURCES, AGENTS.md §10.
@@ -319,3 +356,42 @@ Each entry documents WHAT was decided and WHY.
   für Kohorte x.
 - **Tradeoff**: On-Ramp verzögert den DoE-Start um ~1–2 DS; Quiz-Richtige
   rotieren C/B/A.
+
+## 2026-10-06: Folien-Satzspiegel schmal & zentriert wie die Lektionen (#30)
+
+- **Choice**: `assets/slides.css` begrenzt den reveal.js-Satzspiegel auf
+  `max-width: 1000px` (CSS-Variable `--pmm-slide-measure`), zentriert ihn
+  (`margin-left/right: auto` + `left/right: 0`) und hebt die Grundschrift
+  von 30px auf 32px; Print-Reset `max-width: none`. Der Canvas bleibt pro
+  Datei `1280×800` (`Reveal.initialize`).
+- **Reason**: Die Folien liefen fast randlos über den Beamer (Text/Code/
+  Tabellen bis ~1180px) und wirkten breiter als die `lesson.html`-Seiten
+  (`max-width: 42rem`). Georg wünschte ausdrücklich „so wie die lessons".
+- **Tradeoff**: Größere Schrift + schmalere Spalte erhöhen die Folienhöhe;
+  reveal schrumpft überlaufenden Inhalt nicht (siehe PITFALLS). Werte
+  empirisch auf 32px/1000px getunt (max. Folienhöhe 778px < 800px).
+- **Reichweite**: Eine Änderung an der gemeinsamen `slides.css` wirkt auf
+  alle 11 Präsentationen (`unterricht/KM5-02…KM7-03`, `SA-00…SA-03`) plus
+  die Kohorten-Kopie.
+
+## 2026-10-13: KM7-05 nur für Rscript statt Werkzeug-Dublette (#32)
+
+- **Choice**: Die Rscript-Thematik wurde als **neue Prepared Lesson**
+  `unterricht/KM7-05-rscript-und-kommandozeile/` gebaut — mit bewusst
+  **keinem** Recap der vier RStudio-Fenster. Console/Editor/Run-Button
+  bleiben vollständig in KM7-04; KM7-05 beginnt mit „Console ist nicht
+  Terminal" und behandelt nur das Ausführen ohne RStudio.
+- **Reason**: Bestands-Check vor dem Bau zeigte, dass die ursprüngliche
+  Verwirrung (Console / geöffnete Dateien / Run-Button) von KM7-04
+  bereits komplett abgedeckt wird (Schritt 3 + 5, Fehler 1) — eine
+  volle Werkzeug-Lesson wäre eine Dublette gewesen. Neu war nur
+  `Rscript`/Terminal/`commandArgs()`/Exit-Code/Shebang (0 Treffer in
+  KM7-04).
+- **Tradeoff**: KM7-05 setzt das KM7-04-Wissen voraus (Rückverweis statt
+  Wiederholung); einzeln gelesen fehlt der Fenster-Kontext. Dafür
+  bleiben beide Lessons in ihrem 90-min-Umfang schlank.
+- **Reichweite**: Neu gelernte/verifizierte Ecken flossen als
+  Lehrstoffe ein: Exit-Code 0 bei `maschine.R M4` (`n = 0, NaN`) als
+  Callout „Exit-Code ≠ korrektes Ergebnis"; `Fatal error: cannot open
+  file` → Exit-Code 2 (falscher Skriptpfad). Glossar: 6 Begriffe
+  (Rscript, Terminal, REPL, Exit-Code, Batch-Ausführung, Shebang).
