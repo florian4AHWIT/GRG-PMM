@@ -1,3 +1,17 @@
+---
+type: Conventions
+title: CONVENTIONS — GRG-PMM
+description: Fortlaufende Regeln — Naming, Language, Git, Repo-Struktur, Quizzes, Lernplattform, Assets, Tabellen, Datenquellen
+tags: [pmm, konventionen, pages, lessons]
+generated: { by: opencode/knowledge-persistence, at: 2026-11-08T09:26:51Z }
+verified: { by: opencode/knowledge-persistence, at: 2026-11-08T09:26:51Z }
+status: stable
+sources:
+  - id: issue-46
+    resource: https://github.com/georgernstgraf/GRG-PMM/issues/46
+    title: Lessons — Repo-Pfade durch deutsche Angaben ersetzen
+---
+
 # Conventions
 
 Coding patterns, naming rules, and style agreements for this project.
@@ -25,6 +39,7 @@ Follow these without question. Do not deviate unless explicitly told.
 - Legal documents: `lehrplan/RIS/` (RIS law-text PDFs only, ISO-date prefix)
 - Knowledge persistence: `docs/ai/`
 - Reference materials: `Unterlagen/`
+- Long-running projects: `Projekte/<slug>/` mit eigener `README.md`; Datenprojekt-Schema nach `Projekte/fragestellungen-statistik/` (#36): ein File pro KM (`km7.md`, `km9a.md`, …) + `daten/<name>.csv` mit `<name>.md`-Metadaten (Quelle, Lizenz, Stand, R-Einlesen); kuratiertes CSV erst nach `Rscript`-Einlese-Check. Einzelne Quellen-Vertiefungen liegen als eigenes File direkt in `Projekte/` (z. B. `femizid-taeter-nationalitaet.md`)
 - Class extracts: `lehrplan/pmm-hwit/4HWIT/`, `lehrplan/pmm-hwit/5HWIT/`
 - KM-Steckbriefe (didaktisch): `lehrplan/kompetenzmodule/`
 - Each class folder may have its own `README.md`
@@ -81,27 +96,39 @@ teach-skill lesson quizzes (`quiz.js`, single-correct) in `selbststudium/`.
 - Klein geschriebene Klassenordner am Repo-Root = Kohorten-Ablagen
   (`5ahwit/`, `4ahwit-x/`, `4ahwit-y/`); GROSSBUCHSTABEN unter
   `lehrplan/pmm-hwit/` (Zweig-Ebene) = Lehrplan-Extrakte. Nie mischen.
+- **Kohorten-README `## Aufgaben` (2026-10-19, #34):** Liste läuft **neueste
+  oben** (absteigend nach ISO-Datum), **ohne Lead-in-Zeile** — `## Aufgaben`
+  und direkt darunter der erste Eintrag. Kanonische Regel im `homework`-Skill
+  (opencode-helpers #113); bestehende aufsteigende Listen einmalig komplett
+  drehen, einzelne Einträge nie umformulieren oder löschen.
 - Kohorten-Teilungen großer Klassen: Suffix `-x`/`-y`.
 - Kohorten-Dirs dürfen nur kohorten-spezifisches Material halten;
   gemeinsames Material bleibt unter `unterricht/` (vorbereitete Einheiten)
   bzw. `lehrplan/pmm-hwit/` (Semesterpläne).
 - **Master/Kopien-Modell (#14):** `unterricht/` hält die Master-Einheiten
-  (`praesentation.html` + `hausaufgabe.md` + `lesson.html`) — Kohorten-
-  Abweichungen werden als **Kopien im Kohortenordner** gepflegt (z. B.
-  `hausaufgaben/`), Master-Dateien werden nie direkt angefasst.
+  (`lesson.html` = Lektion und Präsentation in einem, `aufgabe.md`) —
+  Kohorten-Abweichungen werden als **Kopien im Kohortenordner** gepflegt
+  (z. B. `hausaufgaben/`), Master-Dateien werden nie direkt angefasst.
 - Teach-Workspace-Layout: 4ahwit-x/y halten die Workspace-Dateien am
   Ordner-Root (MISSION, RESOURCES, NOTES); 5ahwit nutzt das SWP-Muster
   (nach `GRG-SWP/3ahwii/teach/`): alles unter `teach/`
   (`MISSION.md`, `RESOURCES.md`, `NOTES.md`, `reference/`,
   `learning-records/`) plus Klassenhub-README mit UE-Tabelle.
-- **Lektionsablage (2026-09-28, #20):** vorbereitete (undatierte) Einheiten
-  liegen **flach** unter `unterricht/` als `<PREFIX>-<NN>-<slug>/`
-  (`KM<#>` = Kompetenzmodul, `SA` = schulautonom; `<NN>` läuft pro KM) mit
-  `praesentation.html` + `hausaufgabe.md` + `lesson.html`. Semesterpläne
-  bleiben in `lehrplan/pmm-hwit/`; die Kohorten-`prepared-lessons/` wurden
-  aufgelöst. Terminierte/abgehaltene Lektionen liegen im Datums-Ordner
-  `<klasse>/YYYY-MM-DD__thema/lesson.html` plus Tages-README (Aufgabe als
-  erster eigener `## Aufgabe`-Abschnitt, Pflicht).
+- **Lektionsablage (2026-09-28, #20; aktualisiert 2026-10-19, #37;
+  Umbau 2026-11-02, #40):**
+  vorbereitete (undatierte) Einheiten liegen **flach** unter
+  `unterricht/` als `<PREFIX>-<NN>-<slug>/` (`KM<#>` =
+  Kompetenzmodul, `SA` = schulautonom; `<NN>` läuft pro KM) mit
+  `lesson.html` (zugleich Präsentation, kein separater Foliensatz) und
+  `aufgabe.md` (Beispiel 1–3, je ≥ 2 Teilaufgaben); eine
+  Tages-README-Vorlage gibt es **nicht** mehr — die Lehrperson pflegt das
+  Kohorten-README selbst. Optionaler `daten/`-Unterordner für
+  Schüler-Downloads (nur `unterricht/` wird deployt; Übungs-Rohmaterial
+  bleibt roh, 🎓). Semesterpläne bleiben in `lehrplan/pmm-hwit/`; die
+  Kohorten-`prepared-lessons/` wurden aufgelöst. Terminierte/abgehaltene
+  Lektionen liegen im Datums-Ordner
+  `<klasse>/YYYY-MM-DD__thema/lesson.html`; das README dazu schreibt die
+  Lehrperson.
 - **lehrplan-Ebenen (2026-09-29, #21):** **Fach-Ebene** am `lehrplan/`-Root =
   `METADATA.md`, `RIS/`, `kompetenzmodule/` (KM-Steckbriefe) und KM-keyed
   Ressourcen (`ressourcen-matrix.md`, `r4ds-abdeckung.md`) — formunabhängig.
@@ -116,6 +143,11 @@ teach-skill lesson quizzes (`quiz.js`, single-correct) in `selbststudium/`.
   direkt in der Zielkohorte entstehen (im README kennzeichnen).
 
 ## Lernplattform (GitHub Pages, #27, 2026-10-05)
+- **Deployter Pfad-Bestand ist die einzige referenzierbare Welt (#46, 2026-11-08):** Lesson-Seiten
+  (`index.html` + `unterricht/`) dürfen nur auf Pfade zeigen, die im Pages-Artefakt liegen
+  (aktuell 45 Dateien: `index.html`, `assets/`, `unterricht/`). Pfade zu `lehrplan/`,
+  `Projekte/`, `docs/`, `selbststudium/`, `Unterlagen/` lösen auf Pages nie auf (404).
+  Prüfung vor dem Commit: `grep -rE 'lehrplan/|Projekte/|docs/|selbststudium/|Unterlagen/' unterricht --include='*.html'` → 0 Treffer; nach dem Deploy Link-Sweep gegen Pages (0 × 404).
 - GitHub Pages ist die **Lernplattform**: veröffentlicht wird **nur `unterricht/`**
   (+ zentrales `assets/` + Navigator `index.html`) über
   `.github/workflows/pages.yml` (rsync). Kohorten-Ordner (`4ahwit-*`, `5ahwit`),
@@ -144,23 +176,123 @@ teach-skill lesson quizzes (`quiz.js`, single-correct) in `selbststudium/`.
 - Nutzung ausschließlich über den **Live-Server** (`./serve.sh`) oder
   GitHub Pages — **kein `file://`** (Firefox blockiert `file://`-Subressourcen
   aus Eltern-/Geschwisterverzeichnissen; siehe PITFALLS).
-- Quiz-Markup ist vereinheitlicht: `<div class="quiz" data-loesung="N">` mit
-  `input[type=radio]` (0-basierte `value`), je Option `data-grund` und
-  `<p class="feedback" aria-live="polite">`. `assets/quiz.js` zeigt beim
-  `change` sofort die Begründung der gewählten Option und färbt `.feedback`
-  mit `.richtig`/`.falsch` — ein Skript für Klassen und Selbststudium.
+- Quiz-Markup ist vereinheitlicht (Format 2.1, #42): `<div class="quiz"
+  data-titel="Quiz: <thema-slug>">` mit je Frage `<fieldset class="frage">`,
+  Frage im `<legend class="frage-text">`, vier Checkbox-Optionen in
+  `.optionen` (lesson-präfixierter `name`, je Option `data-grund`). Die
+  Lösungsmenge steht **je Option** als `data-richtig` am Input — **kein
+  `data-loesung`, keine Positionskodierung**: `quiz.js` mischt die
+  Optionen beim Laden (Fisher-Yates), Reihenfolge und `value` sind
+  bedeutungslos. **Keine Stufen** (`data-stufe`, `niveau`) und **kein
+  Show-Modal**; ein „Überprüfen"-Button je Frage, Infokugel je Option,
+  Färbung je Option, versteckte `aria-live`-Statuszeile.
+  **Infokugel-Bedienung:** Desktop öffnet per Hover (`pointerenter` mit
+  `pointerType === "mouse"`), Touch per Tap — der Tap toggelt und lässt die
+  Blase offen (zweiter Tap oder Tap daneben schließt). Tastatur öffnet über
+  `:focus-visible`. Kein `mouseenter`/`mouseleave` mehr (siehe PITFALLS,
+  Touch-Doppeleffekt), keine Long-Press-Variante: die Begründungen sind
+  mehrzeilig und müssen ohne gehaltenen Finger lesbar sein. Auf Touch
+  (`@media (hover: none)`) ist die Kugel größer (1.75rem) und hat eine
+  unsichtbare Trefferfläche (2.5rem × 2.25rem), Desktop bleibt bei 1.25rem.
+  Der Radio-Altmodus bleibt in `quiz.js` für alte Kohorten-Kopien lesbar,
+  wird aber nicht mehr neu gebaut.
 - Initialisierung in über `loader.js` geladenen Skripten (`quiz.js`,
-  `theme.js`, …) läuft über einen **`readyState`-Guard**, nicht über einen
-  bloßen `DOMContentLoaded`-Listener:
+  `theme.js`, `tables.js`, …) läuft über einen **`readyState`-Guard**, nicht
+  über einen bloßen `DOMContentLoaded`-Listener:
   `if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", start); } else { start(); }`
   — der Loader injiziert die Skripte asynchron nach dem Parsen (siehe PITFALLS).
 
-## Folien / reveal.js (#30)
-- **Layout zentral in `assets/slides.css`**, nie pro `praesentation.html`.
-  Die Datei hält Grundschrift (32px) und Lesemaß
-  (`--pmm-slide-measure`, 1000px, zentriert, Print-Reset `max-width: none`).
-- Jede `praesentation.html` setzt nur noch Inhalt + `Reveal.initialize({…
-  width: 1280, height: 800 …})` und lädt `slides.css` über den Loader.
-- Zielbild: schmaler, zentrierter Satzspiegel wie `lesson.html` — keine
-  randfüllende Breite. Solche Änderungen immer gegen `height` 800 prüfen
-  (reveal schrumpft nicht, siehe PITFALLS).
+## Tabellen (#44, 2026-11-08)
+
+- **Volles Gitter:** `th`/`td` tragen `1px solid var(--line)`, die Kopfzeile
+  ist mit `var(--code-bg)` hinterlegt und mit `2px solid var(--muted)`
+  abgesetzt; mobil (≤480px) kompaktere Zellen. Kein Zebra-Streifen.
+- **Querscroll nur in der Tabelle:** `assets/tables.js` (vom Loader auf
+  jeder Seite geladen) hüllt jede `<table>` in `div.tabelle-scroll`.
+  Die Hülle scrollt waagrecht (`overscroll-behavior-x: contain`), die
+  Tabelle behält ihre natürlichen Spaltenbreiten:
+  `width: max-content; min-width: 100%; max-width: 150%`. Der Deckel bei
+  150 % verhindert, dass textlastige Tabellen mehrere Bildschirme breit
+  werden — sie brechen dann um.
+- **Nie die Seite scrollen lassen:** Eine überbreite Tabelle darf
+  `documentElement.scrollWidth` nicht vergrößern; sonst verkleinert der
+  mobile Browser die ganze Lesson (Schrift!) und rechts bleibt ein leerer
+  Streifen (siehe PITFALLS). Prüfbefehl-Skizze: bei 360 px Breite muss
+  `documentElement.scrollWidth === window.innerWidth` gelten.
+- **Affordanz:** `.tabelle-scroll.ist-breit` (nur wenn wirklich scrollbar)
+  malt einen Randschatten und setzt `tabindex="0"` + `role="region"` —
+  Android zeigt Scrollbalken nur während des Scrollens. Nicht scrollende
+  Tabellen bekommen keinen Tab-Stopp.
+- **Druck:** `@media print` setzt `display: table`, `width: 100%`,
+  `overflow: visible` und dunklere Linien (`#8a8a8a`) — sonst schneidet der
+  Querscroll die rechten Spalten ab.
+- `assets/style.css` (Selbststudium/Referenzseiten) bleibt bewusst bei
+  seinen einfachen Trennlinien; das Gitter gilt nur für die Lernplattform.
+
+## Folien / reveal.js — BEENDET (#42, 2026-11-07)
+
+> Alle `praesentation.html`-Dateien sind gelöscht, `assets/slides.css`
+> entfernt. Die `lesson.html` ist die einzige Präsentationsform
+> (Grundregel 6); Seeleute, die alte Foliendateien suchen, finden sie in
+> der Git-Historie. Kein reveal.js, kein CDN, keine Folien-Links im
+> Navigator.
+
+## Offene Daten beschaffen (#36)
+- **data.gv.at ist seit dem Portal-Umbau eine SPA:** Die alte
+  CKAN-API (`/katalog/api/3/action/package_search`) liefert HTML.
+  Katalogsuche über `https://www.data.gv.at/api/hub/search/search?q=<begriff>`
+  (Parameter heißt `q`, nicht `query`), Details je Datensatz über
+  `/api/hub/search/datasets/<id>` — dort stehen `distributions` mit
+  `access_url`, Format und Lizenz.
+- **Statistik Austria OGD:** Datensatz-Code aus dem Katalog
+  (`https://data.statistik.gv.at/web/catalog.jsp`), Daten-CSV unter
+  `https://data.statistik.gv.at/data/<CODE>.csv`, Dimensions-Files unter
+  `.../<CODE>_C-<DIM>-0.csv` (Semikolon, kodierte Codes).
+- **Rdatasets-Kopien:** kuratierte CSVs aus Rdatasets werden 1:1
+  übernommen (Original-Spaltennamen inkl. `rownames`); die
+  `<name>.md`-Metadaten nennen Paket, Lizenz, Original-URL und
+  Kontrollwerte. Kein Umbenennen — sonst brechen Doku-Links und
+  `Rscript`-Vergleiche.
+
+## Datenbank-Zugang (psqlx, #37, 2026-10-29)
+- **Ein Wrapper pro Datenbank-Projekt:** `Projekte/boku/psqlx` sourcet die
+  `.env` im eigenen Ordner (`PSQLX_ENV` überschreibt den Pfad) und
+  `exec`t `psql --no-password "$@"` — kein Argument-Parsing, keine
+  eingebetteten Zugangsdaten, keine Connection-URI im Skript.
+- **Zugangsdaten nur in `.env`** (`PG*` + Alias `READONLY_DB_PASSWORD`),
+  mode 600, `.env` global in der Root-`.gitignore` (public repo). Doku
+  nennt Variablennamen, nie Host oder Account.
+- **Read-only ist doppelt gesichert:** Account-Rechte + `PGOPTIONS=-c
+  default_transaction_read_only=on`; `PSQLX_RW=1` hebt nur die
+  Session-Sperre auf (ohne Schreibrechte am Account bleibt es read-only).
+- **Immer `PGCONNECT_TIMEOUT` setzen** (im Wrapper: 10 s): ohne Timeout
+  hängt libpq bei einem toten Host unbegrenzt, statt schnell zu scheitern.
+- **SQL-Beispiele in `joins.md` werden vor dem Commit ausgeführt**, nicht
+  nur geschrieben — bei nicht erreichbarem Server ersatzweise gegen einen
+  Wegwerf-Datenträger (`BEGIN; create temp table …; ROLLBACK;`), damit
+  Syntax und Spaltenauflösung belegt sind.
+- **Schema-Erkundung liefert nach `joins.md`:** FK-Graph aus
+  `pg_constraint`, Kardinalitäten per `count(*)`-Gegenprobe (INNER-JOIN
+  muss die Basistabelle verlustfrei reproduzieren), dazu eine
+  Fallstricke-Tabelle. Neue Erkenntnisse gehören dort hin, nicht in
+  Chat-Protokolle.
+- **bash-Wrapper werden mit `shellcheck` geprüft**, bevor sie committet
+  werden (`shellcheck psqlx` muss still bleiben).
+- **R-Skripte parsen `.env` nicht** — sie erwarten exportierte `PG*`-Variablen
+  (`source .env && Rscript …`) und brechen mit Hinweis ab, wenn eine fehlt.
+  Asymmetrie bewusst: `psqlx` sourcet selbst, R-Skripte nicht.
+- **R-Skripte rendern nur mit `OUT=`** (ggsave) oder interaktiv (RStudio);
+  in einer `Rscript`-Session ohne `OUT` wird nichts geschrieben, damit kein
+  `Rplots.pdf` im Arbeitsverzeichnis landet.
+- **Rückgabewerte aus SQL vor dem Plotten typisieren:** `count(*)` kommt als
+  `integer64`, `as.numeric()` verhindert stille Formatierungsfehler.
+
+## Lesson-Sprache: deutsche Angaben statt Repo-Pfade (#46, 2026-11-08)
+- Repo-interne Pfade erscheinen auf Lernplattform-Seiten **nie** — nicht als Link,
+  nicht als Pfad, nicht als `<code>`; stattdessen deutsche, für Schüler:innen lesbare Angaben.
+- Kanonische Formulierungen: `lehrplan/pmm-hwit/jgN-semesterplan-{ws,ss}.md` →
+  „Semesterplan <N>. Klasse, <Winter|Sommer>semester“ (das Wort „Semesterplan“ nicht
+  doppeln, wenn es im Satz schon steht); `lehrplan/kompetenzmodule/kmN.md` →
+  „KM<N>-Steckbrief“; interne Bau-Skripte → „Bau-Skripte hinter den Übungsmaterialien“.
+- Jahrgangsangaben in Lesson-Prosa: „3./4./5. Klasse“ („4. Jahrgang“ ist ebenfalls
+  etabliert) — **keine** `JG<N>`-Kürzel auf Lernplattform-Seiten.

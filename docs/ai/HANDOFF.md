@@ -2,20 +2,65 @@
 
 ## Open Tasks
 
-### 5ahwit: `## Hausaufgaben` verweist auf fehlende Ablage
+### Erfundener YouTube-Link in Selbststudium-Lesson 02 (#47)
 **Priority:** low
-**Context:** `5ahwit/README.md` Sektion `## Hausaufgaben` verweist auf
-`hausaufgaben/` („Kohorten-Kopien der Master-HAs") — der Ordner existiert
-nicht. Festgestellt bei Homework-Discovery 2026-10-12.
-**Action:** Ablage anlegen (Kopien aus `unterricht/SA-0N-*/hausaufgabe.md`)
-oder Verweis aus dem README entfernen.
+**Context:** `Unterlagen/check-links.sh --all` meldet als einzigen echten
+404 `https://www.youtube.com/playlist?list=PL8+z9X2Mm7m9z2Mm8mD_8Qz3Q3J3J3J3`
+in `selbststudium/prepared-lessons/02-daten-einlesen-deskriptiv.html:558`
+(Primärquellen-Callout, „Statistik mit R — YouTube-Kurs"). Die ID ist
+offensichtlich erfunden, nicht nur verschoben.
+**Action:** Entweder durch einen real existierenden deutschsprachigen
+R-/Statistik-Kurs ersetzen (Link vor dem Einbau per `check-links.sh` prüfen)
+oder den Satz streichen — nicht auf Verdacht raten.
 
-### Wissensüberprüfung 4AHWIT-x am 2026-10-13 (GRG-PMM-T #4)
-**Priority:** high (Prüfung ist morgen)
-**Context:** Erste WÜ der Kohorte x: 25 MC + 3 Freitext (145 P) — Setup,
-SA-00, R-Basics, ggplot (Selbststudium), Git. Dateien committed in
-`GRG-PMM-T/4ahwit-x/`. Grundlage war der korrigierte README-Verlauf (#31).
-**Action:** Nach der Prüfung: ggf. Anpassungen, dann GRG-PMM-T #4 schließen.
+### Lektionsserie Datenaufbereitung: SA-05–SA-07 (#37)
+**Priority:** medium (Reihe läuft nach Bedarf, eine Lesson pro Sitzung)
+**Context:** SA-04 gebaut (`7f70261`). Offen: **SA-05** JSON & APIs
+(`jsonlite`, Eurostat/OGD live, echte API-Rohantworten als Übungsmaterial —
+Kopien liegen in `/tmp/opencode/`, ggf. frisch ziehen), **SA-06**
+Aufbereitung `unlist()` & Konvertieren (JSON-STAT → tidy, Technik aus
+`daten/_build/build_data.R` als Lernstoff), **SA-07** Postgres
+(`DBI`/`RPostgres`, echter Schul-Server laut Lehrer-Angabe). Format:
+neues Lesson-Layout (`lesson.html` = Präsentation, `aufgabe.md`,
+Vorlage, optionaler `daten/`-Ordner, 🎓 Rohmaterial bleibt roh).
+Materialbasis: echte (raue) Projektdaten.
+Toolchain für SA-07 steht seit 2026-10-29 (#38): `libpq-dev` installiert,
+`DBI` 1.3.0 + `RPostgres` 1.4.10 in der User-Lib, `Postgres()`-Smoke-Test
+grün. **Datenzugang geklärt (2026-10-29, `0487102`):** Server erreichbar,
+read-only Account, Schema + fertige Joins in `Projekte/boku/joins.md`,
+Erkundung per `Projekte/boku/psqlx` (sourcet `.env`). Für SA-07 noch zu
+tun: Lesson inkl. `daten/`-Ordner bauen — der Join-Graph aus `joins.md`
+ist der Lernstoff (siehe auch #37-Kommentar vom 2026-10-29).
+
+### Fragestellungen-Statistik (#36) — Weiterführung nach erstem Lauf
+**Priority:** low (Langprojekt, kein Termin)
+**Context:** Erster Lauf (KM7+KM9a) ist committed (`c426fca`); Themen
+Klima/Klimaerwärmung und Impfungen/Corona-Mythen sind ergänzt
+(`e168d49`: klima-klimawandel.md, corona-impfmythen.md + 3 CSVs, 12
+kuratierte CSVs gesamt). Vierte Erweiterung (`5587a60`, 2026-10-21):
+`kuriose-quellen.md` (F-C1…F-C16) + 7 CSVs (22 gesamt);
+`build_data4.R`. Offen: Eigenmaterial-Blöcke
+(Annahmestichproben ISO-Tabellen/Simulation, RSM-sequenziell,
+FM-Instandhaltung), AÖF-Femizid-Listen digitalisieren (bewusst als
+Schüler-Aufgabe konzipiert), Eurostat-CSVs vor Unterricht frisch ziehen
+(`lastTimePeriod=3`-Filter veraltet), altersstratifizierte AT-Impfdaten
+(F-C3) bei Aufgaben-Bau kuratieren, GeoSphere-Stations-CSV (F-K3) bei
+Aufgaben-Bau ziehen, AMS-Zeitreihe (nationale Quote, F-W3) bzw.
+PKS-Anzeigen-Reihe (F-W4) aus PDFs kuratieren, Wien-`gogv`-Downloads
+(Hunde, Radzählstellen) nach 503 wieder prüfen und ggf. kuratieren,
+Ideen-Parkplatz aus `kuriose-quellen.md` ausformulieren, KM8/KM9b bei der
+SS-2027-Planung ergänzen.
+Konvention: `Projekte/fragestellungen-statistik/README.md`.
+
+### 5AHWIT: DS-Stoff 7.10. + 14.10. nur in Erinnerung, nicht im Repo
+**Priority:** medium
+**Context:** Bei der Stoff-Recherche für die 5AHWIT-WÜ fehlt der Beleg für
+die DS 7.10. und 14.10. — im Repo steht nur die Überschrift
+`2026-10-14_chi_quadrat_schulübung`. Lehrer-Angabe mündlich: dort lief
+Chi-Vertiefung/Setup; konkretes Thema für 7.10. nie genannt.
+**Action:** Verlauf in `5ahwit/README.md` nachziehen (Tagesordner oder
+README-Absatz), sonst bleibt jede spätere Recherche (Prüfungen, WÜ) für
+diese Termine lückenhaft.
 
 ### Andere Repos auf die neue lehrplan-Ordnung ziehen (opencode-helpers #92)
 **Priority:** medium
@@ -60,7 +105,32 @@ Chat (teach-Skill).
 pro Einheit statt Stücke pro Los"; LR schreiben, `jg3-verlauf.html`
 auf ✅; danach L05 bauen.
 
+
 ## Erledigt (dieser Zyklus)
+- **GRG-PMM-T #5 (2026-11-07):** Alle drei WÜ korrigiert — 4ahwit-x/2026-10-20
+  (14), 5ahwit/2026-10-21 (17), 4ahwit-y/2026-10-23 (12): je Schüler
+  grading.md + email.json, Aggregate CLASS.md/GRADINGS.md/EMAIL.json.
+  Commits `4a44e37`, Noten-TSV `4a4546d`/`5b8d604` (#121). E-Mail-Payloads
+  liegen bereit je Klassenordner — Versand ist Sache der Lehrperson.
+  Issue geschlossen, Handoff-Eintrag entfernt.
+- **#42 komplett (2026-11-07):** Quiz-Format 2.1 in allen 11 Quiz-Lessons; SA-00–03 geerntet (SA-00 Neubau 90 min, SA-01–03 vertieft), alle `praesentation.html` gelöscht, `assets/slides.css` entfernt, Navigator + Folien-Querverweise (KM7-04/05, SA-04-Footer, km7-verlauf, 4ahwit-x/README, 5ahwit-Kopie) auf lesson.html, 20 GLOSSAR-Einträge, Docs angepasst. Alle Folien-Behauptungen per Rscript geprüft, fünf falsche korrigiert (342 statt 344 Punkte, Ausreißer-Demo 10.0475, ggplot2 4.0.3 „group_by ohne summarise" = 1 Panel, dplyr-Fehlermeldung, 8 statt 11 Spalten). **Beobachtung:** SA-04-Quiz hat fast nur 1-richtig-Verteilung (18 Fragen, einmal 2) — falls je nachgebessert.
+- **GRG-PMM #40 (Nachtrag):** Quiz-Format-2.0-Styling-Rework
+  (`assets/lesson.css` + `assets/quiz.js`) committed und gepusht
+  (`2e2fe73`, 2026-11-03) — war aus der #40-Session uncommitted liegen
+  geblieben. Wiederholungsmaterial `5ahwit/2026-11-04_wh_chi2/`
+  (basics.R + CSV) mitgenommen (`5b862ce`).
+- **GRG-PMM #22 (Teil):** KM7-02-Erklärungen nachgeschärft (`4a5ae13`,
+  2026-11-03): M3-Zellbeitrag aufgedröselt, „alle sechs Zellen"-Präzisierung,
+  Merke-Callout „hier keimt die Warning" (Vorwärtsverweis auf Schritt 5),
+  df-Abschnitt vertieft (Frei/Fest-Gitter + Kalibrierungssatz). Die Muster
+  flossen verallgemeinert als Abschnitt „Schülerperspektive
+  (Erklärungsempathie)" in den create-lesson-Skill (opencode-helpers #123,
+  Commit `d93acb0`).
+- **GRG-PMM #36:** Themenfile `kuriose-quellen.md` (16 Fragestellungen
+  F-C1…F-C16 + Ideen-Parkplatz) und 7 kuratierte Alltagsdatensätze
+  (Vornamen Top 100, Schokoladenduft-RCT, Schokoladenkuchen-DoE, Pizza,
+  Billboard, Spotify, LEGO) mit Metadaten und `build_data4.R`; alle
+  Links per `curl`, alle CSVs per `Rscript` geprüft. Commit `5587a60`.
 - **GRG-PMM #32:** neue Prepared Lesson `KM7-05` „Rscript und die
   Kommandozeile" (Terminal, frische Session, `commandArgs()`, Exit-Code,
   Shebang; Callout „Exit-Code ≠ korrektes Ergebnis"); Navigator + Glossar

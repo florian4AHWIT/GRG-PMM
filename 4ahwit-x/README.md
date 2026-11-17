@@ -1,11 +1,29 @@
 # 4AHWIT-X — PMM Unterlagen
 
-## Aufgaben
+## online lernen (handy-tauglich)
 
-Kanonische Liste aller Aufgaben — Details im jeweiligen Tagesordner bzw. der verlinkten Lesson.
+<https://georgernstgraf.github.io/GRG-PMM/>
 
-- 2026-09-22: HÜ-Kontrolle Setup (git/VS Code/R/RStudio) + Start R-Basics UE 1 → [2026-09-22_git_vscode_Rstudio_installation/](./2026-09-22_git_vscode_Rstudio_installation/)
+## 2026-11-17_selbststudium_t_test
+
+- <unterricht/KM7-01-mittelwertsvergleich-t-test>
+- feedback zu dieser Lektion
+- bitte in Deinem Repo ISO-8601 Ordnernamen verwenden
+- so ein Ordner IST ein R-projektordner.
+
+## Aufgaben ganzes Semester
+
+- 2026-11-10_rtooling: Recherchiere eigenständig, wie du
+das eingelesene Betriebsdaten‑File
+als Excel wieder in das R‑Projekt
+zurückschreiben kannst. Erweitere
+das in der Schule erstellte Skript
+dahingehend, dass CSV eingelesen
+und im Excel‑Format ausgegeben
+wird.
 - 2026-10-06: SA-01 ggplot als Selbststudium-Aufgabe, ins persönliche git pushen → [unterricht/SA-01-datenvisualisierung-ggplot/](../unterricht/SA-01-datenvisualisierung-ggplot/)
+- 2026-09-22: HÜ-Kontrolle Setup (git/VS Code/R/RStudio) + Start R-Basics UE 1 → [2026-09-22_git_vscode_Rstudio_installation/](./2026-09-22_git_vscode_Rstudio_installation/)
+- 2026-09-15: Setup-HÜ — R/RStudio/Git installieren, eigenes PMM-Repo anlegen, Lektionen in RStudio ausführen → [2026-09-22_git_vscode_Rstudio_installation/](./2026-09-22_git_vscode_Rstudio_installation/)
 
 ## 2026-10-06__was kann r
 
@@ -14,7 +32,7 @@ Selbststudium-Aufgabe — nicht live unterrichtet.
 
 - alle Übungen von der Folie selber commiten!
 
-Aufgabe: <https://georgernstgraf.github.io/GRG-PMM/unterricht/SA-01-datenvisualisierung-ggplot/praesentation.html>
+Aufgabe: <https://georgernstgraf.github.io/GRG-PMM/unterricht/SA-01-datenvisualisierung-ggplot/lesson.html>
 
 Ins persönliche git pushen!!
 
@@ -50,13 +68,13 @@ Kontrolle mit Verifikation: `2026-09-22_hue-kontrolle.md`
 Weiteres Material (nur Verweise, keine Kopien):
 
 - Übersichtsfolie „Was kann R?":
-  `../unterricht/SA-00-was-kann-r/praesentation.html`
+  `../unterricht/SA-00-was-kann-r/lesson.html`
 - Lektion SA-01 (ggplot — **nicht** live am 22.9.; am 2026-10-06 als
   Selbststudium-Aufgabe verteilt, siehe Eintrag oben):
   `../unterricht/SA-01-datenvisualisierung-ggplot/lesson.html`
 - Lektion SA-02 (nächste DS): `../unterricht/SA-02-daten-transformieren-dplyr/lesson.html`
 - Hausaufgabe UE 1:
-  `../unterricht/SA-01-datenvisualisierung-ggplot/hausaufgabe.md`
+  `../unterricht/SA-01-datenvisualisierung-ggplot/aufgabe.md`
 
 ## 2026-09-15
 

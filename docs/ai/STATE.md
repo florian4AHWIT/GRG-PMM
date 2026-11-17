@@ -1,8 +1,150 @@
+---
+type: State
+title: STATE — GRG-PMM
+description: Aktueller Projektstatus — Fokus, abgeschlossene Zyklen, offene Punkte
+tags: [pmm, status]
+generated: { by: opencode/knowledge-persistence, at: 2026-11-08T14:00:00Z }
+verified: { by: opencode/knowledge-persistence, at: 2026-11-08T14:00:00Z }
+status: stable
+sources:
+  - id: issue-45
+    resource: https://github.com/georgernstgraf/GRG-PMM/issues/45
+    title: Navigator-Bootstrap index.html
+  - id: issue-46
+    resource: https://github.com/georgernstgraf/GRG-PMM/issues/46
+    title: Lessons — Repo-Pfade durch deutsche Angaben ersetzen
+  - id: issue-47
+    resource: https://github.com/georgernstgraf/GRG-PMM/issues/47
+    title: Tote externe Links reparieren + Link-Check-Skript
+---
+
 # Project State
 
-Current status as of 2026-10-13.
+Current status as of 2026-11-08.
 
 ## Current Focus
+**Tote externe Links repariert + Link-Check-Skript (#47, 2026-11-08):**
+Alle externen Link-Ziele in `unterricht/` per `curl` geprüft — eine tote URL,
+18× in 6 Lessons: `learningstatisticswithr.com/book/` (404). Das Navarro-Buch
+liegt seit der Quarto-Portierung am Site-Root, Kapitel als `NN-slug.html`;
+alle Verweise zeigen jetzt auf die passende Kapitelseite (KM5-01/02/03 →
+`09-probability.html`, KM7-01 → `13-ttest.html`, KM7-02 → `12-chisquare.html`,
+KM7-03 → Kap. 11 + 13). Mitkorrigiert: der falsche deutsche Bortz-Titel in
+5 Lessons, die Kapitelangabe in KM7-03 (Kap. 16 → 11) und 8 Treffer im
+Kohorten-Archiv (`4ahwit-x/`, `4ahwit-y/`, `5ahwit/`). Neu:
+`Unterlagen/check-links.sh` (getrackte `href`/`](…)`-Ziele, `--all`,
+`--strict`; 403/429/5xx = WARN, 404/410/000 = FAIL, Exit 1) — Standardlauf
+24 URLs grün, `--all` deckt zusätzlich zwei Altlasten in
+`selbststudium/RESOURCES.md` auf (Kaggle-R-Kurs weg, `adv-r`-DSL-Kapitel
+verschoben), beide ersetzt. Offen: erfundener YouTube-Playlist-Link in
+`selbststudium/prepared-lessons/02-daten-einlesen-deskriptiv.html`.
+
+**Lernplattform-Navigator gerettet (#45) und Pages-Inhalte gesäubert (#46), 2026-11-08:**
+Die Startseite war auf jedem Aufrufweg (`/`, `/index.html`, Pages) unformatiert — die
+Inline-Bootstrap-Probe in `index.html` definierte die innere Suchfunktion, rief sie aber
+nie auf (`})})();` statt `})()})();`). Fix ist ein Zeichenpaar (`222cf38`); Pages-Sweep
+danach 15/15 Seiten grün (Stylesheet, Badge, `__SITE_ROOT__`), Link-Sweep 0 × 404.
+Parallel alle 19 Repo-Pfad-Referenzen in Lesson-Seiten durch deutsche Angaben ersetzt
+(`2dfe1b9`): Semesterplan-Pfade → „Semesterplan 4. Klasse, Wintersemester“,
+Steckbrief-Pfade → „KM7-Steckbrief“, zwei echte 404-Links (KM5-01, SA-03) zu Fließtext,
+`JG3`/`JG4` → „3./4. Klasse“. Pages-Artefakt unverändert 45 Dateien. Details:
+DECISIONS/CONVENTIONS/PITFALLS 2026-11-08.
+**Tabellen mobil (#44, 2026-11-08):** `lesson.css` hat jetzt echte
+Tabellen-Regeln (volles Gitter, Kopfzeile hinterlegt) und
+`assets/tables.js` (neu, vom Loader auf jeder Seite geladen) hüllt jede
+Tabelle in `.tabelle-scroll`: Der Querscroll bleibt in der Tabelle, die
+Seite bleibt Viewport-breit. Vorher zog eine breite Tabelle die Seite auf
+bis zu 495 px bei 360 px Gerätebreite — mobiles Chrome/Brave skalierte die
+ganze Lesson herunter und ließ rechts einen leeren Streifen. Deckel
+`max-width: 150%`, Randschatten als Scroll-Hinweis, `tabindex`/`region`
+nur bei echtem Querscroll, Druck zurück auf `display:table` mit dunkleren
+Linien. Verifiziert: Sweep über alle 14 Lessons bei 360/393 px, Touch-Swipe
+per CDP, Desktop 900 px, Druck-Emulation; Quiz-Touch-Tests (#43) weiter
+grün. Details: DECISIONS/PITFALLS 2026-11-08.
+
+**Infokugeln touch-fähig (#43, 2026-11-08):** Die Quiz-Infokugeln waren auf
+dem Handy nur über „wildes Herumrühren" erreichbar, weil Touch `mouseenter`
+und `focus` **vor** `click` feuert und der Toggle die Blase damit sofort
+wieder schloss. `assets/quiz.js` nutzt jetzt Pointer-Events mit
+`pointerType`-Filter, `:focus-visible` für Tastaturfokus und einen
+`document`-`pointerdown`-Listener zum Schließen bei Tap daneben;
+`assets/lesson.css` vergrößert Kugel (1.75rem) und Trefferfläche auf
+`@media (hover: none)` und unterdrückt iOS-Kontextmenü/Doppeltap-Zoom.
+Verifiziert mit CDP-Touch-Test über zwei Lessons (KM7-02, SA-02) in beiden
+Modi. Details: PITFALLS 2026-11-08.
+
+**Quiz-Format 2.1 — Kern-Batch fertig (#42, 2026-11-07):** Skill und
+Assets sind angeglichen (`data-richtig` je Option, `quiz.js` mischt
+beim Laden, kein `data-loesung`, keine Stufen, kein Modal). Umgestellt
+sind jetzt **10 Lessons**: KM6-01, KM7-01–03 (2.0-Zyklus) sowie
+KM5-01 (10 Fragen + neues `aufgabe.md`), KM5-02 (2→10 Fragen), KM5-03
+(13, Datenfehler `choose(36, 8)` korrigiert), KM7-04 (20), KM7-05 (16,
+Schritt 1 neu abgedeckt), SA-04 (18) — der Sechser-Batch lief als
+Subagent-Batch (Spec `/tmp/opencode/quiz21-spec.md`, je Lesson ein
+Subagent mit eigenem Chrome-Port; Klicktest-Harness
+`/tmp/opencode/quiz21-test.mjs`, beides ephemär). Jede Lesson doppelt
+geprüft (Subagent-Port + Gegenprobe), alle Zahlen per `Rscript`.
+Lehrplan-Details-Blöcke und Weiter-Links in den fünf neuen Lessons
+ergänzt. **Ernte abgeschlossen (2026-11-07):** SA-00 neu gebaut
+(lesson.html + aufgabe.md, 12 Fragen), SA-01–03 geerntet und auf 90 min
+vertieft (SA-01 18, SA-02 17, SA-03 18 Fragen, alle 2.1), alle
+`praesentation.html` gelöscht, `assets/slides.css` entfernt, Navigator
+und alle Folien-Querverweise (KM7-04/05, SA-04-Footer, km7-verlauf,
+4ahwit-x/README, 5ahwit-Kopie) auf lesson.html umgezogen, 20 neue
+GLOSSAR-Einträge. Alle Folien-Behauptungen gegen Rscript geprüft — fünf
+waren falsch/veraltet und wurden korrigiert (Details DECISIONS 2026-11-07).
+Harness `sa-harvest-test.mjs` über alle 5 Lessons grün (statischer
+Quiz-2.1-Vertragscheck; liegt ephemär in `/tmp/opencode/` wie schon
+`quiz21-test.mjs`).
+
+**Lektionsserie Datenaufbereitung (#37):** SA-04 „Daten einlesen II: die
+raue Wirklichkeit" ist gebaut und committed (2026-10-19, `7f70261`) —
+erste Lesson im neuen Format (`lesson.html` = Präsentation, `aufgabe.md`,
+Tages-README-Vorlage, `daten/`-Unterordner mit rohem Übungsmaterial:
+NASA-GISTEMP, OGD-Verurteilungen + Dimensions-Dateien, 2 erzeugte
+Excel-Übungsdateien). Quiz-8-Fragen, Playwright-Klick-Test grün.
+Offen: SA-05 (JSON & APIs), SA-06 (`unlist` & Konvertieren), SA-07
+(Postgres, echter Schul-Server) — je eine Lesson pro Sitzung.
+Lesson-Struktur-Doku (AGENTS/README/CONVENTIONS/ARCHITECTURE) auf
+neues Format nachgezogen.
+
+**SA-07-Datenbasis (2026-10-29, #37, Commit `0487102`):** Schul-Postgres
+ist erreichbar (`pg_isready` grün, PostgreSQL 16.15). Neuer Ordner
+`Projekte/boku/` — `psqlx` (psql-Wrapper auf `.env`/`PG*`, read-only
+erzwungen, Passwort nie ausgegeben), `joins.md` (ER-Graph, 3 FKs, 6
+verifizierte Abfragen, Fallstricke), `README.md`, `.env` (gitignored).
+Datenbasis: `fish_catches` 464.654 · `samplings` 10.497 · `river_sites`
+6.260 · `fish_species` 125, 1998–2024; 4-Tabellen-INNER-JOIN verlustfrei.
+
+**Fragestellungen-Statistik (#36):** Neues Langprojekt
+`Projekte/fragestellungen-statistik/` — aus KM7/KM9a abgeleitete
+Fragestellungen mit kuratiertem Datenmaterial (Statistik Austria OGD,
+Eurostat, Rdatasets/agridat). Erster Lauf committed (2026-10-19,
+`c426fca`): 9 KM7- + 8 KM9a-Fragestellungen, 9 kuratierte CSVs mit
+Metadaten, Rdatasets-Katalog als Suchwerkzeug; Rückverlinkung in
+Ressourcen-Matrix und Semesterplänen. Erweiterung (2026-10-19,
+`e168d49`): Themenfiles `klima-klimawandel.md` (GISTEMP-Trend,
+GeoSphere-Stationen) und `corona-impfmythen.md` (Übersterblichkeit,
+Base-Rate-Fehlschluss, Simpson-Paradox) + 3 weitere kuratierte CSVs
+(tempanomalien-global, wochensterbefaelle-oesterreich,
+covid-impfquote-vs-todesrate) — 12 CSVs gesamt. Dritte Erweiterung
+(2026-10-19, `851578a`): Themenfile `datensaetze-im-widerspruch.md`
+(statistische Praktiken-Checkliste, 4 Konflikt-Paare) + 3 CSVs
+(tempanomalien-zwei-quellen, covid-at-gemeldet-vs-uebersterblichkeit,
+arbeitslosigkeit-at-ilo) — 15 kuratierte CSVs gesamt.
+
+**Kuriose Quellen (#36, 2026-10-21):** Themenfile
+`kuriose-quellen.md` mit 16 Fragestellungen aus Alltag/Popkultur
+(Vornamen, Hunde je Bezirk, Radverkehrszählstellen, Todesursachen,
+Wiener-Linien-Takt, Wahlen, Spotify, Pizza, Billboard, LEGO,
+Schokoladenduft-RCT, Schokoladenkuchen-DoE, Eurostat Zeitverwendung/
+Apfelernte, Alkoholkonsum, JSON-APIs) + Ideen-Parkplatz. 7 neue
+kuratierte CSVs mit Metadaten (`vornamen-oesterreich-top100`,
+`schokoladenduft-buchladen`, `schokoladenkuchen-bruchwinkel`,
+`pizza-verkauf-2015`, `billboard-top100-2000`, `spotify-songs`,
+`lego-preise`) — 22 CSVs gesamt; Build `daten/_build/build_data4.R`;
+alle per `Rscript` geprüft, Commit `5587a60`.
+
 **Lernplattform (#27):** GitHub Pages liefert nur noch `index.html`, `assets/`
 und `unterricht/` (`.github/workflows/pages.yml`, umgestellt von legacy
 Branch-Deploy); Kohorten (`4ahwit-*`, `5ahwit`), `selbststudium/` und
@@ -21,6 +163,85 @@ opencode-helpers (#92) entsprechend umgebaut (Fach-Ebene vs. Zweig-Ebene,
 unterricht ohne Zweig-Fach-Ordner).
 
 ## Completed (this cycle)
+- [x] 2026-11-07 — **Quiz-2.1-Sechser-Batch** (#42, Subagent-Batch nach
+      Context-Economy-Regel, Commits `8d1d60a` KM5-01 (+aufgabe.md),
+      `9dd5a07` KM5-02 (2→10 Fragen), `6c696a6` KM5-03 (+Datenfehler
+      choose(36,8)), `2435b74` KM7-04 (20 Fragen), `b255bdb` KM7-05
+      (16, Schritt 1 neu), `e555c78` SA-04 (18)): je Lesson ein
+      Hintergrund-Subagent mit Spec-File und eigenem Chrome-Port,
+      Rückgabe nur Kurzberichte; Hauptsession machte Gegenprobe
+      (Struktur-Grep + eigener Klicktest) und Commits. Nebeneffekt:
+      opencode-helpers #126 — Context-Economy-Regel jetzt in
+      AGENTS.global.md verankert (`5b1b749` dort).
+- [x] #38 CLOSED 2026-10-29 — R-Postgres-Toolchain auf think repariert:
+      `install.packages("RPostgres")` scheiterte an fehlendem `libpq-dev`
+      (`fatal error: libpq-fe.h`, kein `pg_config`). `sudo apt install -y
+      libpq-dev` (18.6, Ubuntu 26.04) → `DBI` 1.3.0 + `RPostgres` 1.4.10
+      in der User-Lib; Smoke-Test `class(Postgres())` = `PqDriver`,
+      `dbGetInfo()` meldet `client.version 18/6`. Vorbereitung für SA-07;
+      Pitfall dokumentiert.
+- [x] 2026-10-21 — Themenfile `kuriose-quellen.md` (#36, Commit `5587a60`):
+      16 Fragestellungen aus kuriosen offenen Daten (F-C1…F-C16) —
+      Wien/Österreich (Vornamen, Hunde, Radzählstellen, Todesursachen,
+      Öffi-Takt, Wahlen), Popkultur (Spotify, Pizza, Billboard, LEGO,
+      Schokoladen-RCT, Kuchen-DoE), Europa (Eurostat Zeitverwendung,
+      Apfelernte, Alkohol), API-Spielwiese (SWAPI/PokéAPI/Open-Meteo);
+      Ideen-Parkplatz mit 6 weiteren Funken. 7 kuratierte CSVs +
+      Metadaten + `build_data4.R` (22 CSVs gesamt); alle Links per
+      `curl` 200 (Wien-`gogv`-Downloads am 21.10. temporär 503),
+      alle CSVs per `Rscript` eingelesen, Build deterministisch.
+- [x] 2026-10-19 — Lektion **SA-04** „Daten einlesen II: die raue
+      Wirklichkeit" (#37, Commit `7f70261`): 6 Schritte (readLines-Ritual,
+      Preamble/`skip`, NA-Marker/char-Falle, `read_csv2`/`locale`, Excel
+      Sheets/„n. gemessen", OGD-Codes + Joins + Aggregatzeilen), 3
+      Vorhersage-Aufgaben, 3 typische Fehler, Quiz 8 Fragen (Rotation
+      2·0·3·1·2·0·3·1), `aufgabe.md` mit Kontrollwerten (Anomalie 2024 =
+      1.28 · LG-Summe 2024 = 45 958 · M3 n = 38), Tages-README-Vorlage,
+      Navigator + 6 Glossar-Begriffe. `daten/` mit rohem Übungsmaterial
+      (NASA gemeinfrei, StatA CC BY 4.0, 2 writexl-erzeugte Excels,
+      Herkunft dokumentiert). Verifikation: R-Blöcke per `Rscript`,
+      Live-Server 200er, **Playwright-Klick-Test** (falsch/richtig-
+      Begründungen, Theme-Toggle). 🎓-Schutzkonvention ins
+      Projekt-README; Lesson-Struktur-Doku überall nachgezogen.
+- [x] 2026-10-19 — Projekt `fragestellungen-statistik` erster Lauf (#36, Commit
+      `c426fca`): KM7-Map (9 Fragestellungen) + KM9a-Map (8) nach festem Format
+      (Frage → Quelle → R-Weg → Aufgabenskizze → UE-Anker → Status); 9
+      kuratierte CSVs (Eurostat nrg_pc_204 tidy, Verurteilungsstatistik-OGD
+      tidy, AER cps1985/gss7402/houseprices, agridat cochran.factorial/
+      chinloy.fractionalfactorial/cochran.latin/cox.stripsplit) je mit
+      Metadaten-File, alle per `Rscript` einlesgeprüft; Rdatasets-Katalog
+      (3.648 Einträge) in `daten/_index/`; alle externen Links per curl
+      verifiziert (200). Ehrlichkeits-Regeln: Observationsdaten ≠
+      Versuchsdaten → DoE via agridat, Annahmestichproben/RSM/FM-Instandhaltung
+      als 🏭 Eigenmaterial markiert. Rückverlinkung: Ressourcen-Matrix,
+      jg4/jg5-Semesterpläne, Root-README. Details: DECISIONS/PITFALLS.
+- [x] 2026-10-19 — WÜ-Set für alle drei Klassen gebaut (GRG-PMM-T #5, Commit
+      `a224ee0`): 4AHWIT-x 20.10. (Setup, SA-00, R-Basics, ggplot, Git, Block E
+      R/R-GUI/RStudio — Live-Stoff vom 13.10.), 5AHWIT 21.10. (Setup, VS Code/
+      Workspace, GitHub-Workflow, R-On-Ramp, Chi-Quadrat KM7-02), 4AHWIT-y
+      23.10. (Setup, R-Grundlagen, Kennzahlen/Verteilungen, Binomialverteilung
+      mit R, sd/var/n−1). Je 35 MC à 4 P + 3 FT à 15 P = 152 P; alle Zahlen per
+      `Rscript` gegen `assets/betriebsdaten.csv`/`palmerpenguins` verifiziert.
+      Kein Notenschlüssel in den Solutions (Lehrer-Wunsch: nur Punktezahl).
+      Vorläufer WÜ 13.10. nie gehalten → GRG-PMM-T #4 geschlossen.
+- [x] #34 CLOSED 2026-10-19 — Kohorten-READMEs: kanonische Aufgabenlisten auf
+      „neueste oben, keine Lead-in-Zeile" umgestellt (x/y/5ahwit), Commit
+      `0ee09e9`; Regel im `homework`-Skill verankert (opencode-helpers #113,
+      Commit `7633210`, Issue geschlossen).
+- [x] 2026-10-19 — Missing-Pull im GRG-PMM-Klon nachgeholt: `bc91c78` („aufg.",
+      Lehrperson-Commit vom 16.10. aus der y-Stunde) war lokal nachzuziehen;
+      darin dokumentiert: y arbeitet an KM5-01 (Binomial), Aufgabe „ALLE
+      R-Sachen" ins persönliche Repo.
+- [x] #33 CLOSED 2026-10-14 — Datenquellen-Sammlung für den Statistikunterricht
+      gestartet: neues Top-Level-Verzeichnis `Projekte/datenquellen-statistikunterricht/`
+      (`README.md` + erste Quellen-Datei `quellen/femizid-taeter-nationalitaet.md`)
+      — Recherche zu „Femizid & Täter-Nationalität": Parlamentsanfragen PA 18374/J
+      (PKS 2019–2023, disaggregiert Bundesland × Geschlecht × Alter × Nationalität)
+      und PA 453/J (2024), Statistik-Austria-Prävalenzstudie 2021 (inkl. .ods-OGD),
+      AÖF-Jahreslisten 2019–2025, BMJ-Studie/Koordinierungsstelle/Eurostat/UNODC;
+      alle 24 Links per curl verifiziert (200); Methodik-Kapitel (Nennerproblem,
+      kleine n, Simpson, Operationalisierung) als Unterrichtsanschlüsse.
+      Root-README-Aufbau-Tabelle um `Projekte/` erweitert. Commit `2c59448`.
 - [x] #32 CLOSED 2026-10-13 — Lesson `KM7-05` (Rscript & Kommandozeile): neue
       Prepared Lesson unter `unterricht/KM7-05-rscript-und-kommandozeile/` —
       Lektion = Präsentation, 7 Quizfragen (Rotation 2/0/3/1/2/0/3),
@@ -91,15 +312,24 @@ unterricht ohne Zweig-Fach-Ordner).
 - [ ] JG3 Phase 0: L04 Abschnitt 3 (Poisson) durcharbeiten, dann L04 ✅; danach L05+.
 
 ## Notes
-- 2026-10-12: Ordnername `4ahwit-y/20206-10-09_opencode/` enthält einen
-  Datumstippfehler (`20206` statt `2026`) — bewusst **nicht** umbenannt
-  (README-Verlauf + Aufgabe.md verweisen darauf); Pitfall siehe PITFALLS.md.
+- 2026-11-03: KM7-02-Erklärungen nachgeschärft (`4a5ae13`, #22); die
+  Muster stehen jetzt als Abschnitt „Schülerperspektive" im
+  create-lesson-Skill (opencode-helpers #123). Quiz-Format-2.0-
+  Styling-Rework nachgezogen (`2e2fe73`, #40) — offen bleibt nur der
+  manuelle Klick-Check der Lernquizze (HANDOFF).
+- 2026-11-01: Ordnername `4ahwit-y/2026-10-09_opencode/` (früher `20206-…`) per
+  `git mv` korrigiert, README-Link nachgezogen (#119); die frühere
+  „eingefroren"-Regel ist aufgehoben (Pitfall siehe PITFALLS.md).
   `5ahwit/README.md` Sektion `## Hausaufgaben` verweist auf eine
   `hausaufgaben/`-Ablage, die (noch) nicht existiert — Klärung offen.
 - R 4.5.x mit `tidyverse`, `palmerpenguins`; Verifikation per `Rscript`
   (Arbeitsverzeichnis = Repo-Root). Betriebsdaten `assets/betriebsdaten.csv`
   (nur M3 hat Ausschuss: 4 von 40 bei ±0,15 mm — M1/M2 sauber; KM5-02s
   „6 von 40" ist ein Szenario, nicht die CSV).
+- Postgres-Zugriff in R steht seit 2026-10-29 (`DBI` 1.3.0, `RPostgres`
+  1.4.10, `libpq` 18.6 via apt `libpq-dev`) — SA-07 kann gebaut werden.
+  Server + Zugang sind bestätigt (`Projekte/boku/`, #37, `0487102`);
+  Schema/Join-Graph in `Projekte/boku/joins.md`.
 - Nutzung: `./serve.sh` → `http://localhost:8000/`; **kein `file://`** (Firefox).
 - Web-Assets: ein Top-Level `assets/`; Bootstrap + Badge generisch (CONVENTIONS).
 

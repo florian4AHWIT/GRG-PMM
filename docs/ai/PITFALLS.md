@@ -1,3 +1,23 @@
+---
+type: Pitfalls
+title: PITFALLS — GRG-PMM
+description: Fehlbarkeitserfahrung — CDP-/Messfallen, Pages-Fallen, Datenquellen-Fallen, R-Stolpersteine
+tags: [pmm, cdp, pages, lehrplan, r]
+generated: { by: opencode/knowledge-persistence, at: 2026-11-08T14:00:00Z }
+verified: { by: opencode/knowledge-persistence, at: 2026-11-08T14:00:00Z }
+status: stable
+sources:
+  - id: issue-45
+    resource: https://github.com/georgernstgraf/GRG-PMM/issues/45
+    title: Navigator-Bootstrap index.html
+  - id: issue-46
+    resource: https://github.com/georgernstgraf/GRG-PMM/issues/46
+    title: Lessons — Repo-Pfade durch deutsche Angaben ersetzen
+  - id: issue-47
+    resource: https://github.com/georgernstgraf/GRG-PMM/issues/47
+    title: Tote externe Links reparieren + Link-Check-Skript
+---
+
 # Pitfalls
 
 Things that do not work, subtle bugs, and non-obvious constraints.
@@ -13,7 +33,7 @@ Read this file carefully before making changes in affected areas.
 - **`gh issue create/comment --body` with German text breaks the shell.** Umlaut-Quotes („"), parentheses and em-dashes in inline `--body "…"` cause `syntax error near unexpected token`. Fix: always write the body to a temp file first (`/tmp/opencode/*.md`) and use `--body-file`.
 - **NIST e-Handbook root URL is frames-based** (`itl.nist.gov/div898/handbook/` replies "frames-compatible browser required" to fetchers). Fetch chapter pages directly, e.g. `…/handbook/pmc/pmc.htm` (Kap. 6 Monitoring & Control — verified). Chapter-code pattern is `…/handbook/<code>/<code>.htm`; verify each code before citing it.
 - **Multiple-Choice-Tests: Alphabetische Sortierung in Lösungs-Tabellen erzeugt scheinbare A-Cluster.** Bei 4-korrekt-Fragen steht in der alphabetisch sortierten Lösungstabelle immer „A, B, C, D" — das Verify-Skript liest „A" als erste korrekte Option. Wenn mehrere 4-korrekt-Fragen aufeinanderfolgen, entsteht ein scheinbarer A-Cluster, der gegen CONVENTIONS verstößt. Abhilfe: bei 3-korrekt-/2-korrekt-Fragen in der Folge die Option-Reihenfolge in der Schüler-Datei so permutieren, dass die erste korrekte Option variiert (B, C, D). Bei 4-korrekt-Fragen ist der Cluster unvermeidbar — durch brechende 3/2/1-korrekt-Fragen dazwischen auf ≤ 4 halten.
-- **Answer-Shuffling: Distraktor bei 3-korrekt-Fragen muss über A/B/C/D rotieren.** Ein häufiger Fehler ist, den Distraktor immer auf D zu legen („D ist meistens falsch"). Die CONVENTIONS-Regel verlangt ausdrücklich Rotation über alle 4 Positionen (je ~5–6× bei 20–24 3-korrekt-Fragen). Vor Commit mit `verify_quiz.py` prüfen — das Skript zählt die Distraktor-Position und warnt bei Clustern.
+- **Answer-Shuffling: Positionen nie im Markup kodieren — `quiz.js` mischt selbst.** Bis Format 2.0 stand die Lösungsmenge als DOM-Position im `data-loesung`-Attribut; dadurch musste jede Option von Hand über A/B/C/D rotiert werden, und genau daraus entstand der KM7-03-Fehler (Zyklus 0-1-0-2-1, Position D nie richtig). Seit Format 2.1 (2026-11-07, #42) trägt jede richtige Option `data-richtig`, und `quiz.js` mischt die Optionen per Fisher-Yates beim Laden — Rotation ist damit strukturell garantiert und **kein Prüfschritt mehr**. Nie wieder `data-loesung` in Lernquiz-Feldsets schreiben; Prüfbefehl: `grep -c 'data-loesung' <lesson>` muss 0 sein (Radio-Altmodus ausgenommen).
 - **0-korrekt-Fragen (alle Distraktoren) sind erlaubt und gewünscht.** Die CONVENTIONS-Regel verlangt „at least a few 1-correct, 2-correct, and 4-correct" — 0-korrekt ist nicht explizit gefordert, aber eine wertvolle Kategorie (erkennt, ob Schüler raten). In den Hinweisen muss „1 bis 4 Antworten richtig" zu „0 bis 4" geändert werden, sobald 0-korrekt-Fragen existieren. Lösungs-Tabelle verwendet „−" (Minus) als Eintrag für 0-korrekt-Fragen.
 - **R auf dieser Maschine verschwand zwischen 2026-09-15 und 2026-09-16** (STATE notierte `/usr/bin/Rscript`, das nicht mehr existierte). Reinstalliert per `sudo apt-get install r-base-core r-cran-tidyverse` — Ubuntu-Binärpakete, kein Compiler nötig; das ersetzt den mühsamen Header-Weg (siehe darüber) und erledigt den tidyverse-Meta-Blocker. `palmerpenguins` ist nicht in den Ubuntu-Repos: `install.packages()` scheitert an nicht-beschreibbarem `/usr/local/lib/R/site-library` → `sudo Rscript -e 'install.packages(...)'` (reines Datenpaket, kompiliert nichts). Aktuelle Version: R 4.3.3 (nicht 4.5 wie zuvor notiert).
 - **System-Upgrade frisst apt-R-Pakete (2026-09-22).** Nach Upgrade auf R 4.5.2 war `r-cran-tidyverse` aus apt verschwunden; die Kern-Komponenten (dplyr, ggplot2, readr, …) lagen noch in der User-Lib `~/R/x86_64-pc-linux-gnu-library/4.5/`, aber das Meta-Paket `tidyverse` fehlte → `library(tidyverse)` schlug fehl (alle Lektionen nutzen es). Fix: Header-Weg + zusätzlich `libuv1-dev` (Kette `fs` → `sass` → `bslib` → `rmarkdown` → `reprex`), dann `install.packages("tidyverse")` in die User-Lib (kein sudo nötig). Merke: Das Meta-Paket zieht Web-/Google-Deps (`rvest`, `googledrive`, `googlesheets4`) mit — für den Unterricht reichen die Kern-Komponenten, aber `library(tidyverse)` braucht das Meta-Paket.
@@ -22,7 +42,212 @@ Read this file carefully before making changes in affected areas.
 - **GitHub-Pages-Asset-Auflösung ohne Repo-Namen (2026-09-27).** Ein zentrales `assets/` kann aus beliebig tiefen Seiten nur gefunden werden, wenn der Root zur Laufzeit bestimmt wird. GRG-PMM nutzt eine Inline-Probe auf `assets/loader.js` (Ahnen-Verzeichnisse, `onload`/`onerror`); der Loader leitet den Root aus seiner eigenen `src` ab. Fehlt `/…/assets/loader.js` (umbenannter Klon, Root-Serving), greift die Probe weiter oben bzw. schlägt fehl — dann Pfad/Server prüfen. Kein `<base>` verwenden: es würde die bewusst relativen In-Page-Links umbiegen.
 - **R-Code liest `assets/betriebsdaten.csv` relativ zum Repo-Root.** Das Arbeitsverzeichnis für alle R-Beispiele ist der Repo-Root; nach der Asset-Konsolidierung (2026-09-27) lautet der Pfad `assets/betriebsdaten.csv` (vorher `unterricht/HWIT-PMM/assets/…`). Beim Ausführen aus dem Repo-Root per `Rscript` verifizieren.
 - **Über `assets/loader.js` injizierte Skripte dürfen sich nicht auf `DOMContentLoaded` verlassen (2026-10-02, #24).** Der Loader hängt `data-js` per `document.createElement("script")` an — das läuft **asynchron nach dem Parsen**; `DOMContentLoaded` ist dann oft schon gefeuert. Ein reiner `document.addEventListener("DOMContentLoaded", …)`-Initialisierer (früher in `quiz.js`) registriert nie → Symptom u. a. Quiz-Radio-Klicks ohne Rückmeldung. Muster: `if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", start); } else { start(); }` (wie in `github-pages-link.js`). Gleiches gilt für `theme.js` (Toggle erst nach Existenz des Knopfes verdrahten). Fixes: GRG-PMM #24, GRG-WMC #6.
-- **reveal.js schrumpft überlaufenden Inhalt nicht (2026-10-06, #30).** Der Canvas ist pro Präsentation fest (`Reveal.initialize({width:1280, height:800})`); Inhalt höher als `height` wird oben/unten abgeschnitten (reveal skaliert nur an den Viewport, nicht an den Inhalt; `center:true` verteilt den Überlauf beidseitig). Jede Änderung an Schriftgröße/Satzspiegel (`assets/slides.css`) muss gegen `height` geprüft werden: alle Folien anfahren (`Reveal.slide(i)`), `section.present.scrollHeight` gegen `height` vergleichen (headless Chrome, `--dump-dom`). Stand #30: 32px / max-width 1000px → max. 778px.
+- **~~reveal.js schrumpft überlaufenden Inhalt nicht~~ (2026-10-06, #30; MOOT seit 2026-11-07).** ~~Der Canvas ist pro Präsentation fest…~~ **Historisch:** `praesentation.html`/reveal.js und `assets/slides.css` sind mit der #42-Ernte entfernt — die `lesson.html` ist die einzige Präsentationsform. Der Eintrag bleibt als Beleg, falls Foliendateien je wiederaufleben (Git-Historie).
 - **Kohorten-README-Einträge können Unterrichtsplanung vorgreifen (2026-10-12, #31).** Der Eintrag „Lektion SA-01 (heute live)" vom 2026-09-22 war vorausgeplant und falsch — ggplot wurde erst am 2026-10-06 als Selbststudiumsaufgabe vergeben. Vor History-basierten Generierungen (knowledge-exam etc.) README-Aussagen gegen Commit-Messages abgleichen. Der `knowledge-exam`-Skill löst jetzt das private T-Repo auf statt CWD anzunehmen (opencode-helpers `e8813e6`).
-- **Kohorten-Lesson-Ordner mit Datumstippfehler gelten als eingefroren (2026-10-12).** `4ahwit-y/20206-10-09_opencode/` trägt `20206` statt `2026`; der Ordner bleibt so (README-Verlauf, `Aufgabe.md` und Git-Historie verweisen darauf). Tools, die per `YYYY-MM-DD`-Glob datierte Lesson-Ordner erkennen (homework/knowledge-exam/grading), matchen diesen Ordner nicht — bei Kohorten-y-Abfragen manuell prüfen statt blind umbenennen.
+- **Kohorten-Lesson-Ordner mit Datumstippfehler werden umbenannt (2026-11-01, #119).** `4ahwit-y/20206-10-09_opencode/` trug `20206` statt `2026` und wurde per `git mv` auf `2026-10-09_opencode` gezogen (README-Link nachgezogen). Die frühere „eingefroren"-Regel (2026-10-12) ist damit aufgehoben: Tools, die per `YYYY-MM-DD`-Glob datierte Lesson-Ordner erkennen (homework/knowledge-exam/grading), fanden den Ordner sonst nicht. Lehre: Datumsordner nie mit Tippfehler anlegen — ein Rename kostet einen README-Link plus zwei Doku-Stellen.
 - **Gerades `"` in `data-grund`-Attributen terminiert das Attribut (2026-10-13, #32).** In Quiz-Optionen (`<input data-grund="…">`) beendet jedes rohe `"`-Zeichen den Attributwert — escaped Quotes (`\"`) funktionieren in HTML **nicht** (HTML kennt kein Backslash-Escaping). Betroffene Inhalte (z. B. R-Strings `"M2"`) in `data-grund` daher mit deutschen Anführungszeichen („…") oder `&quot;` schreiben. Symptom bei Fehlklicks: abgeschnittene/leere Begründung statt Fehlermeldung — beim Bauen per Tag-Parser bzw. Quiz-Struktur-Check gegenprüfen.
+- **Kohorten-READMEs können direkt von der Lehrperson geändert werden (2026-10-19).** Commits wie `bc91c78` („aufg.", Autor „Georg Graf (SPG)") kommen aus dem GitHub-Web/GUI und sind lokal erst nach Pull sichtbar — vor Stoff-Recherchen (Prüfungen, WÜ, homework) immer `git pull` + Autor/Zeit prüfen, sonst entstehen Dubletten/veraltete Annahmen. Symptom hier: lokal „behind 1", zwei 10-16-Einträge im y-README, einer mit inhaltserzeugendem Commit, einer leer.
+- **Bullet-Listen per edit-Tool umordnen = Verlustrisiko (2026-10-19, #34).** Beim Drehen der Aufgabenlisten ging ein Eintrag zwischen zwei edit-Schritten verloren (`4ahwit-x/README.md`, 10-06-Zeile) und die Überschrift wurde kurzzeitig doppelt — erst der `git diff`-Check hat es gezeigt. Beim Umordnen von Listen immer danach `git diff` gegen die Ausgangsliste prüfen (Zeilenanzahl + alle Datumsangaben vorhanden).
+- **Faktcheck-Rechenfehler in Prüfungsfragen (2026-10-19, GRG-PMM-T #5).** Aus dem Bauch notierte Wahrscheinlichkeiten waren falsch: „M1/M2/M3-Ausschussquote ≈ 1,91/1,94/2,03" statt korrekt 0/0/6 (Absolutzahlen) bzw. 0/0/15 % (Quoten); `pbinom(2,20,0.1)` = 0,677 statt 0,93. Jede Zahl in Prüfungs- und Solution-Dateien per `Rscript` gegen `assets/betriebsdaten.csv`/`palmerpenguins` rechnen — auch „plausible" Werte.
+- **5AHWIT-DS-Inhalte können uncommitted bleiben (2026-10-19).** Die DS 7.10./14.10. haben keine Repo-Belege (nur Überschrift `2026-10-14_chi_quadrat_schulübung`) — Stoff-Recherchen dürfen dort nicht blind aus dem README schließen, sondern müssen beim Lehrer nachgefragt werden. Prüfungs-Basis für 5AHWIT ist bewusst nur der belegte Stoff; ergänzter Stoff erfordert Block-Nachschärfe.
+- **Statistik-Austria-OGD-Datensatznamen täuschen (2026-10-19, #36).**
+  `OGD_krimi001_KRIMI_1` heißt „KRIMI", ist aber die **Verurteilungs-
+  statistik** (sämtliche den Verurteilungen zugrunde liegenden Delikte,
+  Gerichtsperspektive) — **nicht** die PKS-Anzeigenstatistik. Vor jeder
+  Kennzeichnung die Meta-Seite prüfen:
+  `https://data.statistik.gv.at/web/meta.jsp?dataset=<ID>` (Feld
+  „Attribute description" nennt die Messzahlen-Bedeutung). Zudem enthalten
+  die Tabellen **OLG-Aggregatzeilen** (`KRIMJ93-*`) und „Nicht
+  klassifizierbar" (`KRIMEA9-0`) — vor dem Summieren herausfiltern, sonst
+  Doppelzählung. Kodiertes CSV + `C-<dim>`-Dimension-Files per `left_join`
+  lesbar machen.
+- **Eurostat-Statistics-API: `format=TSV` scheitert (2026-10-19, #36).**
+  Die API meldet „Invalid value for 'wsOutputFormat'" bei TSV; nutzbar ist
+  `format=JSON` (JSON-STAT 2.0, Dimension-Filter als Query-Params, z. B.
+  `unit=KWH&lastTimePeriod=3`). Konvertierung nach tidy CSV via
+  `jsonlite` (expand.grid über gedrehte Dimensions-Level, Werte über
+  linearen Index zuordnen). Alternativ das `eurostat`-R-Paket.
+- **OWID-Datenzugriff hat drei Stolpersteine (2026-10-19, #36).**
+  (1) Österreich meldet keine Impfquoten mehr an OWID (seit Mitte 2023)
+  — exakte Stichdaten liefern NA; pro Land den letzten gemeldeten Wert
+  ≤ Stichtag nehmen und das Datum in einer Spalte führen. (2) Der
+  Gesamtsatz `owid-covid-data.csv` (98 MB) ist nur via
+  `raw.githubusercontent.com/owid/covid-19-data/master/public/data/`
+  beziehbar — `covid.ourworldindata.org` löst hier nicht auf (DNS);
+  OWID-Grapher-Voll-Exporte großer Charts (600k Zeilen) antworten
+  wiederholt 503. Kuratierte Schnitte aus dem Gesamtsatz bauen, nicht
+  am Grapher vorbei-removen. (3) Grapher-CSV-URLs brauchen
+  `?v=1&csvType=full&useColumnShortNames=true` für volle Historie;
+  Slug-Raten (404) erst über Web-Recherche klären.
+- **Statistik-Austria-OGD `BEV_BEW` ist eine Bevölkerungsprognose
+  (2026-10-19, #36).** `OGD_bevbewegung_BEV_BEW_2` heißt
+  „Bevölkerungsbewegung", enthält aber Projektionsvarianten
+  (Haupt-/Wachstums-/Alterungsszenario, F-S25V1–V11) — keine
+  beobachteten Sterbefälle. Für Übersterblichkeit: Eurostat
+  `demo_r_mwk_ts` (Wochensterbefälle; **ohne** AGE-Dimension — Filter
+  `unit=NR&sex=T&geo=AT`).
+- **Eurostat-Arbeitsmarkt-API: Alters-Dimension stillschweigend (2026-10-19, #36).**
+  `une_rt_a` kennt **kein** `age=TOTAL` — gültige Codes sind Y15-24,
+  Y15-74, Y20-64, … Ohne Alters-Filter bekommt man stillschweigend
+  Y15-24 (Jugendarbeitslosigkeit ~10–12 %) statt der Gesamtquote (~5 %);
+  Symptom: plausibel klingende, aber falsche Zahlen. Für die Gesamtquote
+  `age=Y15-74` explizit setzen. Der Datensatz für die Arbeitslosenquote
+  nach *nationaler* Definition (`une_rt_n`) ist aus der Dissemination
+  entfernt (404) — AMS-Werte nur noch via AMS-PDF/Seite oder data.gv.at.
+- **HadCRUT-URLs tragen die Versionsnummer im Pfad (2026-10-19, #36).**
+  `https://hadleyserver.metoffice.gov.uk/hadcrut5/data/HadCRUT.5.2.0.0/analysis/…`
+  — bei einem Versionsupdate (Release Notes prüfen: metoffice.gov.uk/
+  hadobs/hadcrut5/index.html) ist der 404 vorprogrammiert. Met Office-
+  Landing (`/hadobs/hadcrut5/data/current/download.html`) rendert die
+  Datei-Links nur per JS.
+- **Excel-Übungsdateien mit writexl: R-Spalten sind homogen (2026-10-19, #37).**
+  Wer in R einer numerischen Spalte zwei Textzellen zuweist
+  („n. gemessen"), koerziert die **ganze Spalte** zu character —
+  writexl schreibt dann alles als Text, und readxl liest die Spalte als
+  `character` statt gemischt numeric/NA. Für die SA-04-Didaktik
+  gewollt („Spalte kommt als Text" ist realer Excel-Schmerz), aber
+  wissen: ein *echt* gemischtes Excel (Zahl-Zellen + einzelne
+  Text-Zellen) erzeugt readrl-Verhalten „numeric + NA mit Warnung" —
+  writexl kann das nicht abbilden. Zusätzlich: readxl-`na = "…"` wirkt
+  nur auf den Marker; danach braucht es `as.numeric()` für den Rest.
+- **Eurostat nrg_pc_204: alte Band-Codes sind leer (2026-10-19, #37).**
+  `KWH3500`, `KWH1200` u. a. haben in den letzten Perioden keine Werte —
+  Filter darauf liefern still NA-Spalten (writexl schreibt dann leere
+  Zellen, readxl gibt eine `logical`-Spalte zurück!). Gültige Bänder
+  vor dem Kuratieren per `table()` prüfen; `stopifnot(!any(is.na(...)))`
+  als Guard in Builds. Nutzbar aktuell: `KWH_LT1000`, `KWH1000-2499`,
+  `KWH2500-4999`, `KWH5000-14999`, `KWH_GE15000`, `TOT_KWH`.
+- **readLines heißt `n`, nicht `n_max` (2026-10-19, #37).** Base-R-
+  `readLines(con, n = 2)` — im Gegensatz zu readr (`n_max`). Beim
+  Erst-Hinschauen-Ritual („readLines n_max=2") läuft man in
+  „unused argument".
+- **`pkill -f` trifft die eigene Shell (2026-10-19, #37).** Enthält der
+  Kommandozeilen-String das Suchmuster selbst (z. B. `pkill -f
+  "http.server"` in einer Zeile, die auch `git commit` enthält), tötet
+  pkill den eigenen Befehl (SIGTERM) — Ausgabe „Killed by SIGTERM".
+  Server-PIDs gezielt beenden oder Muster wählen, das der eigene
+  Befehl nicht enthält.
+- **data.gv.at: alte CKAN-API liefert HTML statt JSON (2026-10-21, #36).**
+  Nach dem Portal-Umbau ist `www.data.gv.at` eine Single-Page-App; ein
+  `curl` auf `/katalog/api/3/action/package_search` gibt die SPA-Hülle
+  (HTTP 200, HTML) zurück — kein Fehler, aber unbrauchbar. Richtig ist
+  `/api/hub/search/search?q=…` (Parameter `q`; `query` wird ignoriert und
+  liefert den vollen Katalog) bzw. `/api/hub/search/datasets/<id>` für
+  Details; `/api/hub/repo/...` antwortet leer.
+- **wien.gv.at-`gogv`-Downloadlinks können 503 liefern, während die
+  Datensatzseiten erreichbar sind (2026-10-21, #36).** Die Kurzlinks wie
+  `https://www.wien.gv.at/gogv/l9ogdhundevie` antworteten mit
+  „Angebot vorübergehend nicht verfügbar" (HTTP 503, HTML), auch mit
+  Browser-User-Agent; die data.gv.at-Datensatzseiten und die
+  Wien-Statistik-Seiten waren 200. Vor Kuratierung erneut ziehen, nicht
+  als toten Link interpretieren.
+- **Rangrichtung bei `ave()` leicht verdreht (2026-10-21, #36).**
+  `ave(-x, g, FUN = function(v) rank(-v))` dreht die Richtung zweimal —
+  Ergebnis: häufigster Wert auf dem *letzten* Rang. Für „Top-N nach
+  Häufigkeit" erst `order(..., -anzahl, name)` und dann
+  `ave(seq_len(n), g, FUN = seq_along)` als Rang verwenden (deterministisch
+  bei Gleichstand).
+- **`RPostgres` scheitert an fehlendem `libpq-dev` (2026-10-29, #38).**
+  `install.packages(c("DBI", "RPostgres"))` baut `DBI` sauber, bricht aber bei
+  `RPostgres` mit `fatal error: libpq-fe.h: No such file or directory` ab
+  (`ANTICONF`, „libpq was not found"). Falle: `postgresql-client*` ist auf
+  think installiert, das **Entwicklungspaket** `libpq-dev` aber nicht — damit
+  fehlen `libpq-fe.h` **und** `pg_config` (beide aus `libpq-dev`), also genau
+  die zwei Erkennungswege des Configure-Skripts (`pg_config` im PATH bzw.
+  `libpq.pc` über `pkg-config`). `libssl-dev`/`pkg-config` waren vorhanden,
+  `DBI` lief. Fix (Ubuntu 26.04, libpq-dev 18.6): `sudo apt install -y
+  libpq-dev`, dann `install.packages("RPostgres")` erneut; Prüfen mit
+  `pg_config --version` und `pkg-config --exists libpq && echo ok`.
+  Verifikation: `class(Postgres())` → `"PqDriver"`, `dbGetInfo()` meldet
+  `client.version 18/6`. Gleiches Muster wie die Header-Falle oben — auf
+  Schul-/Klassenrechnern (SA-07 nutzt einen echten Schul-Postgres-Server)
+  zuerst die `-dev`-Pakete prüfen, nicht die R-Seite debuggen.
+- **`"fishName"` gibt es nicht — Artname nur über den Join (2026-10-29, #37).**
+  Die erste R-Erkundung (`Projekte/boku/.Rhistory`) fragte
+  `SELECT "fishName" … FROM fish_catches` — die Spalte existiert dort nicht.
+  `fish_catches` trägt nur `"speciesId"` (integer, FK auf `fish_species.id`);
+  der Name steht als `fish_species."speciesName"`/`"germanName"`.
+  Verwechslungsfalle: die gleichnamig klingende Spalte `fish_catches."fishId"`
+  ist **Text** (Individuen-/Markierungskennung), **kein** FK, und zeigt
+  nirgendwo hin.
+- **Postgres-Datenqualität: `'NA'` als Text, Kategorie-Schreibweisen, stille
+  `NULL`s (2026-10-29, #37).** In der BOKU-DB `clx` gilt: `assessment` hat
+  `'strip'` (4.579) / `'Strip'` (1.430) / `'strip '` mit Schlussleerzeichen (8)
+  sowie `'Seber-LeCren'`/`'seber-LeCren'` — ohne `lower(btrim(...))` zerfällt
+  eine Kategorie in drei. `assessment = 'NA'` ist **Text** (2.383 Zeilen),
+  `IS NULL` filtert davon nichts. 30,6 % der Fänge haben kein
+  `"totalWeightGr"`, 2,3 % keine Länge — `avg()`/`n()` immer mit
+  `IS NOT NULL` bzw. `count(spalte)` kombinieren. `recapture` ist durchgehend
+  `false` (trotz 17 gesetzter `"pitDec"`), also als Merkmal unbrauchbar.
+  Für Jahresauswertungen: 6 von 10.497 Befischungen haben keinen Fang
+  (INNER JOIN verliert sie), `samplings.year` weicht in 9 Zeilen vom Jahr aus
+  `"catchDate"` ab — eine Zeitquelle festlegen und im Text nennen.
+- **`.env` war im public Repo nicht ignoriert (2026-10-29, #37).** Der
+  BOKU-Ordner enthielt nur untracked Dateien; ein `git add .` hätte das
+  DB-Passwort committet (GitHub Pages-Repo ist öffentlich). Vor jedem
+  Datenbank-Projekt prüfen: `git check-ignore -v <pfad>/.env`. Jetzt global
+  in der Root-`.gitignore`.
+- **Schul-Postgres `clx` bricht sporadisch weg — Connect-Timeout setzen
+  (2026-10-29, #37).** Der Host verweigert zeitweise jede Verbindung
+  (`psql: SSL error: unexpected eof while reading`, danach
+  `pg_isready` → „no response"), ohne dass sich Account oder `.env`
+  geändert hätten. Ohne `PGCONNECT_TIMEOUT` hängt libpq dann **beliebig
+  lange** im TCP-Connect (libpq-Default: kein Timeout) — ein Testaufruf
+  lief 120 s in einen Timeout statt 10 s in eine Fehlermeldung. `psqlx`
+  setzt deshalb `PGCONNECT_TIMEOUT=10` (per Umgebungsvariable
+  überschreibbar). Folge für SA-07: die Lesson darf nicht am toten Server
+  hängen — Fallback einplanen (lokaler Docker-Postgres mit den
+  `daten/`-CSVs) und den Live-Teil als „wenn erreichbar" kennzeichnen.
+- **R-Skript + `Rscript` legt still ein `Rplots.pdf` ins Arbeitsverzeichnis
+  (2026-10-29, #37).** Ein `print(ggplot)` am Skriptende öffnet in einer
+  nicht-interaktiven Session das Default-PDF-Device und schreibt
+  `Rplots.pdf` in das aktuelle Verzeichnis — beim Aufruf aus dem Repo-Root
+  und aus dem Projektordner lagen danach zwei solcher Dateien herum.
+  Muster: `OUT=` → `ggsave()`, `interactive()` → `print()`, sonst nur eine
+  Meldung. Merksatz: Plot-Skripte, die „nur anzeigen", schreiben in
+  Skript-Sessions nichts.
+- **`count(*)` aus RPostgres ist `integer64` — `format()` ignoriert dann
+  `big.mark` (2026-10-29, #37).** Die Fangzahlen kamen als
+  `bit64::integer64` zurück, `format(n, big.mark = ".")` lieferte deshalb
+  „86326" statt „86.326" (nur eine Warnung, kein Fehler); die Achse war
+  korrekt, weil `scales::label_number()` intern nach `numeric` wandelt.
+  Lösung: `ranking$n <- as.numeric(ranking$n)` direkt nach `dbGetQuery()`.
+  Zweite Stolperstelle im selben Code: `label_number(big.mark = ".")` warnt,
+  solange `decimal.mark` nicht ebenfalls gesetzt ist.
+- **`R -e '…'` ist nicht interaktiv — nur `R` im Terminal ist es
+  (2026-10-29, #37).** `interactive()` ist bei `Rscript` **und** bei `R -e`
+  `FALSE`; das Default-Device ist dort die PDF-Funktion, bei `R` im Terminal
+  `X11`, in RStudio `RStudioGD`. Ein Skript, das `print(plot)` nur bei
+  `interactive()` ausführt, zeigt daher mit `R -e` nichts an und schreibt
+  ohne `OUT=` auch nichts — bei „warum sehe ich kein Fenster?" zuerst
+  `getOption("device")` und `interactive()` prüfen.
+  Verifiziert: `R -q -e 'interactive()'` → FALSE, `R --interactive` → TRUE.
+- **`on.exit(dbDisconnect())` am Top-Level einer gesourcten Datei →
+  `bad_weak_ptr` (2026-10-29, #37).** `source("arten-ranking.R")` brach mit
+  `Error: bad_weak_ptr` ab, `Rscript arten-ranking.R` lief — der Fehler liegt
+  nicht am Server und nicht an `.env`. `bad_weak_ptr` ist RPostgres' Meldung
+  für „Verbindung ist schon freigegeben" (so auch in der eigenen Testsuite).
+  Ursache: am Top-Level einer gesourcten Datei gibt es keinen Funktions-Frame;
+  der `on.exit`-Handler feuert erst nach dem Abbau des Auswertungs-Kontexts,
+  wenn RPostgres das Verbindungsobjekt bereits finalisiert hat.
+  Reproduziert (4 Varianten): Top-Level + `on.exit` → Fehler; Top-Level +
+  explizites `dbDisconnect()` → OK; `on.exit` **in einer Funktion** → OK.
+  Regel: DB-Verbindungen immer in einer Funktion aufbauen und schließen
+  (`main()` + `ranking <- main()` am Dateiende), dann laufen Skript- und
+  `source()`-Aufruf identisch.
+- **Quiz-Optionen müssen rotiert werden (2026-11-02, #40).** Beim Schreiben von Lernquizzen landet die richtige Antwort reflexartig auf Position 0 — dann ist das Quiz durch reines Anklicken der ersten Option lösbar. Nach dem Bau prüfen: `grep -o 'data-loesung="[^"]*"' lesson.html` muss über die Optionen streuen; die Lösungsmenge wird beim Umsortieren mitgezogen.
+- **`assets/quiz.js` erkennt den Modus am Markup (2026-11-02, #40).** Checkboxen → Lernquiz (Button, Färbung, Infokugeln); Radios → Altmodus mit Sofort-Auswertung. Wer eine alte Lesson auf Format 2.0 hebt, muss die Radios durch Checkboxen ersetzen und `data-loesung` von einer Zahl auf eine Indexliste umstellen — sonst bleibt die alte Mechanik aktiv.
+- **Uncommitted-Fremdarbeit vor dem Edit prüfen (2026-11-03, #22).** Die KM7-02-Lesson trug beim Editstart ein uncommitted Quiz-1-Rework aus der #40-Session; der Commit `4a5ae13` hat es zusammen mit den eigenen vier Edits aufgenommen (unschädlich — gleicher Workstream), aber die Assets-Hälfte (`lesson.css`, `quiz.js`) blieb zunächst draußen
+(nachgezogen in `2e2fe73`), obwohl die Lesson sie schon referenziert
+(`.niveau`-Badge). Regel: Vor dem ersten Edit einer Lesson `git status` lesen; Lesson und ihre Assets immer im selben Commit zusammen halten, sonst rendert Pages die Lesson mit altem CSS/JS.
+- **Infokugeln brauchen Hover *und* Klick (2026-11-02, #40).** Am Beamer ohne Maus und auf Tablets ist Hover nicht erreichbar; das Widget behandelt `click` deshalb als Toggle. Beim Testen beide Wege prüfen.
+- **Infokugel: Touch löst Hover *und* Fokus *vor* dem Klick aus (2026-11-08, #43).** Auf dem Handy war der Hover-Zustand der Quiz-Infokugeln nur durch „wildes Herumrühren" erreichbar. Ursache: Beim Tap feuerte der Browser `mouseenter` (Blase auf) **und** `focus` (Blase auf) **vor** `click`; der Klick-Toggle sah eine bereits offene Blase und schloss sie sofort wieder. Ein einzelner Tap blitzte also nur auf. Abhilfe (dreifach nötig!): Hover läuft über `pointerenter`/`pointerleave` mit `pointerType === "mouse"` (Touch wird ignoriert), `focus` öffnet nur bei `:focus-visible` (Tastatur), und ohne `mouseleave` auf Touch schließt ein `document`-`pointerdown`-Listener (Capture) alle Blasen, deren Kugel/Blase nicht das Ziel ist. Zusätzlich: `touch-action: manipulation`, `user-select: none`, `-webkit-touch-callout: none` gegen Doppeltap-Zoom und iOS-Kontextmenü; auf `@media (hover: none)` Kugel 1.75rem plus `::after`-Trefferfläche (2.5rem × 2.25rem) — bewusst kein 44-px-Quadrat, weil die Option-Zeilen nur 12px auseinanderliegen und sich die Flächen sonst überlappen. Verifikation ohne Handy: CDP-Test (`Input.dispatchTouchEvent` auf `google-chrome --headless=new`) mit `Emulation.setEmulatedMedia` (`hover: none`) prüft Tap-Öffnen, Tap-Schließen, Tap-daneben, Wischgeste und Trefferfläche; Desktop braucht `--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4`, weil Headless-Chrome sonst `(hover: none)` meldet.
+- **Überbreite Inhalte verkleinern die ganze Mobil-Seite (2026-11-08, #44).** Auf dem Handy blieb rechts ein breiter leerer Streifen, unterbrochen von Tabellen — Ursache war *nicht* ein CSS-Fehler am Body, sondern Seiten-Überbreite: Eine Tabelle, die nicht unter die Viewport-Breite passt, zieht `documentElement.scrollWidth` hoch; mobile Browser (Chrome/Brave) ziehen das Layout-Viewport auf die Inhaltsbreite, skalieren die Seite herunter (die **ganze** Lesson wird klein) und der Rest des Viewports bleibt leer. Messwert vorher bei 360 px Emulation: bis 495 px Seitenbreite. Zwei Regeln daraus: (1) Jede Tabelle scrollt in einem eigenen Container (`.tabelle-scroll`, `assets/tables.js`), sonst scrollt die Seite; (2) `overflow-wrap: break-word` am Body hält lange Pfade/URLs in `<code>` im Fluss — **nicht** in `th`/`td`, dort reißt es die Spalte zusammen und macht die Zeilen turmhoch. Prüfbefehl: bei 360 px muss `documentElement.scrollWidth === innerWidth` für alle `unterricht/`-Lessons gelten (Sweep-Skript in `/tmp/opencode/mobil-sweep.mjs`, ephemär).
+- **`display:block` auf Tabellen ist NICHT dasselbe wie ein Scroll-Wrapper (2026-11-08, #44).** Der verbreitete Trick `table{display:block;overflow-x:auto}` verhindert zwar Seiten-Überlauf, drückt aber die anonyme Tabelle auf ihre **min-content**-Breite: Spalten schrumpfen auf das längste Wort, Zellen brechen in 3–4 Zeilen, Zeilen werden 3× hoch (gemessen: Kopf 57 px, Datenzeilen 102 px statt 35/57 px). Eine echte Tabelle im Wrapper (`display:table; width:max-content`) verteilt die Spalten nach max-content und bleibt einzeilig. Merke: `max-content` ohne Deckel wird bei Fließtext-Zellen mehrere Bildschirme breit → `max-width: 150%` als Kompromiss.
+- **Druck klappt Querscroll-Container ab (2026-11-08, #44).** `overflow-x:auto` und `display:block` auf Tabellen schneiden beim Drucken die rechten Spalten stillschweigend ab (kein Fehler, nur fehlender Inhalt). Pflicht im `@media print`: `table{display:table;width:100%;overflow:visible}` **und** die Hülle auf `overflow:visible`; Linien auf `#8a8a8a` abdunkeln, weil `--line` auf Papier fast verschwindet.
+- **Headless-Chrome meldet immer `(hover: none)` (2026-11-08, #43/#44).** Für Desktop-Prüfungen `--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4` mitgeben; `Emulation.setEmulatedMedia` mit `features` wechselt die Hover-Fähigkeit *nach* dem Laden nicht zuverlässig zurück. Außerdem cachen feste `--user-data-dir` die Assets: bei CDP-Läufen `Network.setCacheDisabled` setzen oder pro Lauf ein frisches Profil verwenden, sonst misst man alte CSS/JS-Stände.
+- **`new Function(text)` parst ≠ der Block führt aus (2026-11-08, #45).** Ein Inline-Script, das eine Funktion nur *definiert* (fehlendes `()` nach `(function t(){…})`), läuft fehlerfrei durch und tut nichts — kein Request, kein Fehler, `__SITE_ROOT__` bleibt weg. `new Function(text)`/`eval`-Parst-Check beweist nur die Syntax, nicht die Ausführung; der Symptom-Check läuft daher immer am DOM/Netzwerk (Stylesheet da? Request gefeuert?), nicht am Parser.
+- **Vor CDP-Messungen prüfen, wer den Debug-Port hält (2026-11-08, #45).** Ein alter headless Chrome aus der Vorsession hielt Port 9223 ~28 h; jedes Tool, das blind auf einen Debug-Port geht, misst dann die falsche Instanz (inkl. widersprüchlicher „unmöglicher“ Befunde). Vor Browser-Messungen `ss -ltnp | grep 922` bzw. einen freien Port wählen und die Instanz über `/json/version` (Browser-Version, Headless-Status) identifizieren.
+- **Navarro-Buch: `/book/` ist tot, Kapitel liegen am Site-Root (2026-11-08, #47).** `https://learningstatisticswithr.com/book/` liefert 404 — das Buch wurde auf Quarto portiert und wird jetzt direkt von der Domain-Wurzel ausgeliefert. Kapitel-URLs folgen dem Muster `NN-slug.html` (`09-probability.html`, `11-hypothesisting.html`, `12-chisquare.html`, `13-ttest.html`, `16-anova2.html`), Anker wie `#sec-errortypes` funktionieren. Die Altversion lebt nur unter `old.learningstatisticswithr.com` und wird laut Autorin abgeschaltet — nicht als Ersatzziel verwenden. Beim Zitieren zusätzlich prüfen, *welches* Kapitel: Fehler 1./2. Art und Teststärke stehen in **Kap. 11** (`sec-errortypes`, „The power function"), nicht in Kap. 16 (Factorial ANOVA). Ein falscher Titel schleicht sich mit: „Statistik für Human- und Sozialwissenschaftler" ist Bortz, Navarros Buch heißt „Learning Statistics with R" und ist englisch.
+- **Offene Hausübung ohne Format und Termin liefert 2/14 Abgaben (2026-11-12, #50).** Die Ferien-HÜ vom 2026-10-23 („nenne als Abgabe in Deinem Repo Wunschthemen") hatte weder Abgabepfad noch Dateinamen noch Termin. Ergebnis nach drei Wochen: 2 von 14 Repos enthielten eine Abgabe, in zwei völlig verschiedenen Formen (ausgearbeitetes Katalog-Format vs. drei Stichwörter in einer Datei ohne Endung). Die 12 Fehlenden waren **nicht** inaktiv — 9 von ihnen hatten die Chi²-HÜ vom 2026-11-06 abgegeben. Merke: Erhebungen, die eine Themenwahl vorbereiten sollen, gehören in die Stunde (Katalog als Menü zeigen), nicht als offene HÜ; und wenn doch als HÜ, dann mit explizitem Pfad, Dateinamen und Datum.
+- **Link-Check nur auf echten Link-Zielen, nicht auf Prosa-URLs (2026-11-08, #47).** Ein `grep 'https\?://…'` über Doku-Dateien zieht URLs aus Code-Spans, Ellipsen (`…/analysis/…`), Templates (`$d.csv`) und kaputten Markdown-Links mit — jedes davon erzeugt einen Falsch-404. `Unterlagen/check-links.sh` extrahiert deshalb nur `href="…"` und `](…)`, prüft nur getrackte Dateien (`git ls-files`, sonst landen `.opencode/node_modules`-READMEs im Sweep) und wertet 403/429 sowie 5xx als WARN statt FAIL (Bot-Blocker; github.com antwortet von diesem Host sporadisch mit 504, obwohl die Repos erreichbar sind). Verbindungsresets (curl-Exit 35, Code 000) brauchen einen eigenen Retry-Loop — `--retry` von curl greift dort nicht.

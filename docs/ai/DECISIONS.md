@@ -1,7 +1,187 @@
+---
+type: Decisions
+title: DECISIONS — GRG-PMM
+description: Chronologische Entscheidungen — Ablage, Assets, Pages, Lehrplan-Layout, Quiz-Format
+tags: [pmm, entscheidungen, pages, lessons]
+generated: { by: opencode/knowledge-persistence, at: 2026-11-08T09:26:51Z }
+verified: { by: opencode/knowledge-persistence, at: 2026-11-08T09:26:51Z }
+status: stable
+sources:
+  - id: issue-45
+    resource: https://github.com/georgernstgraf/GRG-PMM/issues/45
+    title: Navigator-Bootstrap index.html
+  - id: issue-46
+    resource: https://github.com/georgernstgraf/GRG-PMM/issues/46
+    title: Lessons — Repo-Pfade durch deutsche Angaben ersetzen
+---
+
 # Decisions
 
 Architectural and technical decisions made in this project.
 Each entry documents WHAT was decided and WHY.
+
+## 2026-11-08: Pages bleibt strikt die Lernplattform; Lessons ohne Repo-Pfade (#45/#46)
+
+- **Choice (#45):** Der Navigator-Defekt (unformatierte Startseite auf jedem Aufrufweg) war
+  kein Pfadproblem, sondern ein fehlender Aufruf `()` der inneren Funktion der
+  Bootstrap-Probe in `index.html`. Fix: ein Zeichenpaar (`222cf38`); das Bootstrap-Markup
+  bleibt danach byte-identisch zu den 25 funktionierenden Seiten — kein Sonderfall für
+  `index.html`, kein Repo-Name im Code.
+- **Choice (#46):** `lehrplan/` wird **nicht** in das Pages-Artefakt aufgenommen — Pages ist
+  ausschließlich die Lernplattform (`index.html` + `assets/` + `unterricht/`, 45 Dateien,
+  Artefakt-Beleg 1:1 zum Repo, nothing else leaks). Statt nur die zwei toten Links zu
+  reparieren, wurden alle 19 Repo-Pfad-Referenzen in Lesson-Seiten durch deutsche Angaben
+  ersetzt (`2dfe1b9`; Details: CONVENTIONS „Lesson-Sprache“).
+- **Reason:** Planungsmaterial gehört nicht auf die Schülerplattform; Pfade, die dort nie
+  auflösen, sind für Schüler:innen Rauschen und für Maintainer eine 404-Falle.
+- **Tradeoff:** Wer Semesterplan oder KM-Steckbrief öffnen will, geht über das Repo — die
+  Lernplattform verlinkt ihn bewusst nicht.
+
+## 2026-11-08: Tabellen — Gitter, Querscroll im Container, 150-%-Deckel (#44)
+
+- **Choice:** `th`/`td` bekommen ein volles 1px-Gitter (`--line`), die
+  Kopfzeile `--code-bg` + 2px-Unterkante. `assets/tables.js` hüllt jede
+  Tabelle in `div.tabelle-scroll` (Querscroll, `overscroll-behavior-x:
+  contain`); darin `display: table; width: max-content; min-width: 100%;
+  max-width: 150%`. Randschatten + `tabindex`/`role="region"` nur bei
+  tatsächlich scrollenden Tabellen. Druck setzt alles zurück.
+- **Why:** Zwei getrennte Befunde. (1) `lesson.css` hatte **keine**
+  Tabellen-Regel — kein Gitter. (2) Eine zu breite Tabelle zog die
+  Seitenbreite hoch (bei 360 px bis 495 px), mobiles Chrome/Brave skalierte
+  die *ganze* Lesson herunter und ließ rechts einen leeren Streifen; genau
+  das war das gemeldete Layout-Problem. `display:block` auf der Tabelle
+  (naheliegender Null-JS-Trick) verhindert zwar den Seiten-Überlauf,
+  staucht aber die Spalten auf min-content (Zeilen 3× hoch) — deshalb der
+  Wrapper. Der 150-%-Deckel ist der Kompromiss: natürliche Spaltenbreiten
+  statt Wortbruch, aber kein Drei-Bildschirm-Querscroll bei Fließtext-Zellen.
+- **Konsequenz:** Neues Asset `assets/tables.js` (Loader lädt es wie
+  `site.js` auf jeder Seite); `assets/style.css` bleibt unangetastet
+  (Selbststudium/Referenz). Verifikation: Sweep über alle 14
+  `unterricht/`-Lessons bei 360/393 px (`scrollWidth === innerWidth`),
+  CDP-Touch-Swipe (Tabelle scrollt, Seite bleibt), Desktop 900 px,
+  Druck-Medien-Emulation. Doku: CONVENTIONS „Tabellen", PITFALLS.
+
+## 2026-11-08: Infokugeln — Tap toggelt, kein Long-Press, 28-px-Kugel auf Touch (#43)
+
+- **Choice:** Auf Touch öffnet **ein Tap** die Begründungsblase und lässt
+  sie offen; zweiter Tap oder Tap daneben schließt. Hover bleibt
+  Desktop-only (`pointerenter`/`pointerleave` mit `pointerType === "mouse"`),
+  Tastatur öffnet über `:focus-visible`. Auf `@media (hover: none)`:
+  Kugel 1.75rem, unsichtbare Trefferfläche 2.5rem × 2.25rem.
+- **Why:** Der gemeldete „Hover geht nur mit Herumrühren"-Effekt war ein
+  doppelter Toggle: Touch feuert `mouseenter` und `focus` vor `click`, der
+  Klick-Toggle schloss die eben geöffnete Blase sofort. Long-Press wurde
+  verworfen, weil die Begründungen mehrzeilig sind — beim Loslassen wäre
+  die Blase weg und Scrollen blockiert. Kein 44-px-Quadrat als
+  Trefferfläche, weil die Option-Zeilen nur 12px auseinanderliegen und
+  sich die Flächen benachbarter Kugeln sonst überlappen (Fehltreffer).
+- **Konsequenz:** `assets/quiz.js` (Pointer-Events + `aussenklickSchliessen`),
+  `assets/lesson.css` (Touch-Block), CONVENTIONS/PITFALLS/STATE ergänzt.
+  Verifikation per CDP-Touch-Test gegen `--headless=new`-Chrome
+  (`Emulation.setEmulatedMedia` + `Input.dispatchTouchEvent`); Desktop nur
+  mit `--blink-settings=primaryHoverType=2,…` prüfbar, weil Headless
+  sonst dauerhaft `(hover: none)` meldet.
+
+## 2026-11-07: Folien-Ära beendet — SA-00–03 geerntet, `slides.css` entfernt (#42)
+
+- **Choice:** Die letzten vier reveal.js-Präsentationen (`praesentation.html`
+  in SA-00–03) sind gelöscht; SA-00 ist als echte 90-min-Lesson gebaut,
+  SA-01–03 um den ungeernteten Folienstoff vertieft, alle Quizze auf
+  Format 2.1. `assets/slides.css` ist entfernt; `unterricht/` enthält nur
+  mehr Lesson-Ordner (`lesson.html` + `aufgabe.md`, optional `daten/`).
+- **Why:** Zwei Formate für denselben Stoff sind doppelter Unterhalt
+  (#42-Kernmotiv); der Folienstoff war teils reicher als die Lessons
+  (SA-03: komplette Deskriptiv-Statistik, SA-02: `select`/`arrange`/Stil/
+  Projekte, SA-01: Setup/Ritual/Geom-Galerie). Ernte = Übernahme mit
+  kritischer Prüfung, nicht 1:1-Kopie — mehrere Folien-Behauptungen
+  erwiesen sich per Rscript als falsch oder veraltet (344→342 Punkte,
+  Ausreißer-Demo 10.0475 ≠ 10.04, „group_by ohne summarise ⇒ Panel“,
+  altes dplyr-„= statt ==“-Wording, 8 statt 11 Spalten).
+- **Konsequenz:** stil-leitfaden §6 neu (Lesson = Präsentation);
+  CONVENTIONS-Folien-Abschnitt entfernt; PITFALLS-reveal-Eintrag
+  historisiert; Navigator ohne Folien-Links; tote Folien-Links in
+  KM7-04/05, SA-04-Footer, km7-verlauf.html und 4ahwit-x/README
+  nachgezogen.
+
+## 2026-11-07: Quiz-Format 2.1 — Lösungsmenge je Option, Optionen mischt quiz.js (#42)
+
+- **Choice:** Die Lösungsmenge steht **je Option** als `data-richtig` am
+  Input; `data-loesung` am Feldset entfällt. `quiz.js` mischt die Optionen
+  beim Laden per Fisher-Yates; „Nochmal versuchen" behält die Reihenfolge
+  (Begründungen bleiben am Platz). `value` ist endgültig bedeutungslos.
+  0-richtig-Fragen = nirgends `data-richtig`. Radio-Altmodus unverändert.
+- **Why:** Die Positionskodierung (`data-loesung` = DOM-Positionen) erzwang
+  Handrotation über A/B/C/D und produzierte genau daraus den KM7-03-Fehler
+  (Zyklus 0-1-0-2-1, Position D nie richtig). Shuffle macht Rotation
+  strukturell garantiert statt prüfpflichtig — die #42-Abnahme
+  „Positionen rotiert" ist damit **überholt** (Issue-Kommentar).
+- **Konsequenz:** CONVENTIONS „Format 2.1"; PITFALLS-Regel ersetzt
+  (Rotation ist kein Prüfschritt mehr); Migration KM6-01, KM7-01, KM7-02,
+  KM7-03 (70 Fragen, 76 `data-richtig`); KM7-02-Quiznamen nachgezogen
+  (`km7-02-qN`). `verify_quiz.py`-Rotationsprüfung entfällt.
+
+## 2026-10-29: Schema-Erkundung per psql-Wrapper statt per R (#37)
+
+- **Choice:** Der Join-Graph der Schul-Postgres-DB (`clx`) wird mit `psql`
+  erkundet, nicht mit `DBI`/`RPostgres`. Dafür liegt
+  `Projekte/boku/psqlx` (dünner bash-Wrapper) neben einer `.env` mit den
+  `PG*`-Variablen; das R-Erkunden bleibt für die Lesson selbst.
+- **Why:** Joins lassen sich in SQL schneller prüfen (`\d+`, FK-Katalog,
+  `count(*)`-Gegenprobe) als über R-Objekte; R soll in der Lesson das
+  Werkzeug der Schüler:innen sein, nicht das Debug-Werkzeug der Vorbereitung.
+- **Konsequenz:** `.env` ist die **einzige** Quelle der Verbindungsdaten
+  (`PGHOST/PGPORT/PGDATABASE/PGUSER/PGPASSWORD/PGSSLMODE` plus Alias
+  `READONLY_DB_PASSWORD` für den R-Code aus der ersten Erkundung) und steht
+  in der Root-`.gitignore`. Das Repo ist public — Host und Account-Name
+  werden in der Doku bewusst nicht wiederholt, nur Variablennamen.
+- **Wrapper-Semantik:** `--no-password` (nie interaktiv fragen),
+  `default_transaction_read_only=on` per `PGOPTIONS` (abschaltbar mit
+  `PSQLX_RW=1`), Zielzeile auf stderr, Passwort nie auf stdout. Alle
+  Argumente gehen unverändert an `psql` (`-c`, `-f`, `-l`, interaktiv).
+
+## 2026-10-19: WÜ-Format 35 MC + 3 Freitext, kein Notenschlüssel (GRG-PMM-T #5)
+
+- **Choice:** Wissensüberprüfungen ab 20.10. mit **35 MC à 4 P + 3 Freitext à
+  15 P = 185 P** (bisher 25 MC + 3 FT = 145 P). In den Solutions-Dateien steht
+  **keine Notenlegende/kein Notenschlüssel** — nur die Punkteaufteilung und
+  Erwartungshorizonte.
+- **Why:** „30–40 MC, die sind immer schnell beantwortet" — der Lehrer
+  bevorzugt breite MC-Abdeckung; der Notenschlüssel war in den ersten
+  Prüfungsdateien eine Agenten-Zutat (10-%-Staffelung ab 90 %) und wurde auf
+  Hinweis wieder entfernt.
+- **Konsequenz:** Punkte→Note-Übersetzung erfolgt außerhalb der Prüfungsdateien.
+
+## 2026-10-19: Kohorten-README-Aufgabenliste — neueste oben, keine Lead-in-Zeile (#34)
+
+- **Choice:** Die `## Aufgaben`-Sektion im Kohorten-README läuft **absteigend
+  nach ISO-Datum** (neueste Aufgabe ganz oben) und hat **keine Lead-in-Zeile**
+  („Kanonische Liste aller Aufgaben …" entfällt).
+- **Why:** „Im Kohorten-README ist die neueste Aufgabe immer OBEN" — die
+  vorherige homework-Skill-Regel (aufsteigend + Lead-in) setzte sich gegen die
+  Lehrpraxis durch; `5ahwit` war schon von Hand so geführt
+  („## Aufgaben .. neueste oben").
+- **Konsequenz:** Regel ist im `homework`-Skill verankert (opencode-helpers
+  #113, Commit `7633210`); bestehende aufsteigende Listen werden einmalig
+  komplett gedreht (x/y/5ahwit, Commit `0ee09e9`).
+
+## 2026-10-14: Datenquellen-Sammlung als eigenes `Projekte/`-Verzeichnis (#33)
+
+- **Choice:** Öffentliche Datenquellen für den Statistikunterricht werden in
+  einem neuen Top-Level-Ordner `Projekte/datenquellen-statistikunterricht/`
+  gesammelt — `README.md` (Zweck, Verzeichnis, Template-Schema) plus **eine
+  Quellen-Datei pro Themenfeld** unter `quellen/<thema>.md`. Erster Eintrag:
+  `femizid-taeter-nationalitaet.md` (Parlamentsanfragen PA 18374/J + PA 453/J,
+  Statistik-Austria-Prävalenzstudie mit .ods-OGD, AÖF-Jahreslisten, BMJ-Studie/
+  Koordinierungsstelle/Eurostat/UNODC + Methodik-Kapitel).
+- **Reason:** Die Sammlung ist ein langfristiges, wachsendes Vorhaben — weder
+  Unterrichtsmaterial einer Einheit (`unterricht/`) noch Referenzmaterial
+  eines Themas (`Unterlagen/`) noch AI-Knowledge (`docs/ai/`). Aus jeder
+  Quellen-Datei kann später eine Lesson werden (create-lesson-Konvention).
+  Methodische Fallstricke (Nennerproblem, kleine n, Simpson-Paradox,
+  Operationalisierung) sind explizit als Unterrichtsstoff dokumentiert.
+- **Tradeoff:** Vierter Top-Level-Ordner neben `lehrplan/`, `unterricht/`,
+  `Unterlagen/` — Abgrenzung: `Projekte/` =Projekt-bezogene, wachsende
+  Ablagen mit eigener README; Root-README-Aufbau-Tabelle wurde nachgezogen.
 
 ## 2026-10-12: Knowledge-Checks ins private T-Repo (`GRG-PMM-T`), nicht ins Unterrichts-Repo (#31)
 
@@ -395,3 +575,146 @@ Each entry documents WHAT was decided and WHY.
   Callout „Exit-Code ≠ korrektes Ergebnis"; `Fatal error: cannot open
   file` → Exit-Code 2 (falscher Skriptpfad). Glossar: 6 Begriffe
   (Rscript, Terminal, REPL, Exit-Code, Batch-Ausführung, Shebang).
+
+## 2026-10-19: Fragestellungen-Statistik — drei Datenpfeiler, agridat für DoE (#36)
+
+- **Choice:** Das Projekt `Projekte/fragestellungen-statistik/` (KM7/KM9a)
+  stützt sich auf drei Datenpfeiler: **Rdatasets** (sofort-CSVs aus R-Paketen,
+  Katalog in `daten/_index/datasets.csv`), **Statistik Austria OGD**
+  (Kriminalstatistik/Verurteilungen, VPI, Ökosteuern als CSV) und
+  **Eurostat** (JSON-API bzw. `eurostat`-R-Paket). Kuratierte CSVs kommen
+  nur mit `<name>.md`-Metadaten (Quelle, Lizenz, Stand, Einlese-Check)
+  ins Repo. Die DoE-UEs von KM9a werden mit **echten publizierten
+  Versuchsdatensätzen aus `agridat`** gefüllt statt mit Observationsdaten;
+  Blöcke ohne offene Datenbasis (Annahmestichproben, RSM-sequenziell,
+  FM-Instandhaltung) sind offen als 🏭 Eigenmaterial gekennzeichnet.
+- **Why:** Öffentliche Beobachtungsdaten können Versuchsplanung nicht
+  ersetzen — Schein-Fragestellungen wären didaktisch unehrlich.
+  `agridat` löst das Problem mit Feldversuchen (Cochran & Cox), die man
+  auswerten (nicht nachspielen) kann. Rdatasets-Index bleibt Suchwerkzeug
+  (~3.600 Einträge), nicht blind geklonter Datenbestand.
+- **Tradeoff:** Eurostat-CSVs veralten (Filter `lastTimePeriod=3` — Abruf
+  muss vor Unterricht wiederholt werden); agridat-Lizenzen sind pro Paket
+  zu prüfen; Statistik-Austria-Energiebilanzen sind nicht im OGD-Portal
+  (STATcube braucht Lizenz) → Eurostat als Ersatz.
+- **Reichweite:** Erster Lauf nur KM7+KM9a; KM8/KM9b folgen bei der
+  SS-2027-Planung. Ablage-Konvention ersetzt die #33-Struktur
+  (`datenquellen-statistikunterricht/`-Ordner war 2026-10-15 in `c10d653`
+  „un-wslob" aufgelöst worden; Femizid-File liegt direkt in `Projekte/`).
+
+## 2026-10-19: Themenfiles quer zu den KM-Files im Fragestellungen-Projekt (#36)
+
+- **Choice:** Über-KM-thematische Felder (Klima/Klimawandel,
+  Impfungen/Corona-Mythen) bekommen eigene Themenfiles
+  (`klima-klimawandel.md`, `corona-impfmythen.md`) neben den KM-Files
+  (`km7.md`, `km9a.md`) — nicht als Einträge in den KM-Files.
+- **Why:** Diese Themen spannen mehrere KM/UE-Blöcke auf (Regression in
+  KM7-UE5, Simpson in KM7-UE7, Modellvergleich Richtung KM9a-RSM) und
+  tragen einen eigenen, sensitiv-didaktischen Rahmen (Ehrlichkeits-
+  Abschnitte), der in einer KM-Tabelle Platz wegnehmen würde.
+- **Tradeoff:** Fragestellungen liegen jetzt an zwei Orten (KM-File für
+  Standard-Blöcke, Themenfile für Querschnittsthemen); das Projekt-README
+  listet beide Ebenen. AÖF/Femizid bleibt als Vertiefungsfile in
+  `Projekte/` selbst (dort etabliert, #33-Tradition).
+
+## 2026-10-21: „Kuriose" Daten als Querschnitts-Themenfile (#36)
+
+- **Choice:** Alltags-/Popkultur-Datenquellen (Vornamen, Hunde, Rad-
+  zählstellen, Pizza, Spotify, Billboard, LEGO, Schokoladenexperimente)
+  bekommen ein eigenes Themenfile `kuriose-quellen.md` mit F-C-Nummern,
+  nicht Einträge in `km7.md`/`km9a.md`.
+- **Why:** Der verbindende Rahmen ist Motivation, nicht Fachinhalt —
+  die Fragen spannen EDA, Tests, Verteilungen und DoE auf einmal auf.
+  Ein eigenes File hält die KM-Files bei den Standard-Blöcken und macht
+  die „Fun"-Schiene sichtbar.
+- **Tradeoff:** Vierte Ablage-Ebene neben KM-Files, Themenfiles und
+  `daten/`; README-Tabelle muss mitgepflegt werden.
+- **Kuratierungs-Entscheid:** Statistik-Austria-Vornamen nur als
+  Top-100-Slice je Jahr × Geschlecht (8.400 Zeilen) ins Repo — die
+  28-MB-Roh-CSV bleibt Live-Übung (`read.csv2`), nicht Repo-Ballast.
+  Rdatasets-Quellen werden 1:1 kopiert (Original-Spaltennamen, `rownames`
+  bleibt), damit die Doku-Links und `Rscript`-Checks eindeutig bleiben.
+
+## 2026-10-21: Nur echte Versuche als DoE-Material — auch bei „Fun"-Daten (#36)
+
+- **Choice:** Die kuriosen DoE-Beispiele (Schokoladenduft-RCT,
+  Schokoladenkuchen 3×6) sind publizierte, randomisierte bzw.
+  vollfaktorielle Versuche; Beobachtungsdaten (Pizza, Spotify, LEGO,
+  Vornamen) bleiben explizit EDA-/Test-Material.
+- **Why:** Die Ehrlichkeits-Regel des Projekts gilt unabhängig vom
+  Unterhaltungswert; ein „Fun"-Datensatz darf keine Schein-DoE werden.
+- **Tradeoff:** Zwei der kuriosen Fragen (F-C11/F-C12) sind
+  englischsprachige Fremdversuche — Kennzeichnung „echter Versuch" in
+  Metadaten und im Themenfile bleibt Pflicht.
+
+## 2026-11-02: Quiz-Format 2.0 und Übungsbeispiele statt Tages-README-Vorlage (#40)
+
+- **Choice:** Lernquizzes arbeiten mit **Checkboxen** und einer
+  **Lösungsmenge** (`data-loesung="0,2"`, 0–4 richtige Optionen), einem
+  **Überprüfen-Button je Quiz** (keine Sofort-Auswertung), Färbung der
+  Karten (weiches Neongrün/Rot) und **Infokugeln**, die erst nach der
+  Prüfung Lösungsmenge und `data-grund`-Begründungen zeigen (Hover, Fokus,
+  Tipp). Danach wird der Button zu „Nochmal versuchen".
+- **Why:** Das Quiz ist ein **Lernquiz**, kein Punkttest — die Wahrheit zu
+  den Fragen zählt, nicht die Quote. Mehrfach-richtig entspricht dem
+  WÜ-Format (Knowledge Assessments) und verhindert Rate-Erfolge.
+- **Show-Modal:** Dasselbe DOM wird per CSS-Klasse bildschirmfüllend
+  (Backdrop-Blur, Kreuz oben rechts, Escape schließt) — Beamer-/Klassenmodus
+  ohne zweiten Foliensatz.
+- **Übungsbeispiele:** Jede Lesson erzeugt drei abzugebende Beispiele
+  (`Übungsbeispiele.md`, Beispiel 1–3, je ≥ 2 Teilaufgaben). Die Lehrperson
+  weist daraus zu („als Hausübung: Beispiel 2"); der Begriff „Hausübung"
+  kommt in keiner Schülerdatei vor.
+- **Kein Template mehr:** Tages-README-Vorlagen entfallen; die Lehrperson
+  pflegt das Kohorten-README selbst. Lehrplan/KM/Runtime stehen als
+  `<details>`-Block in der Lesson.
+- **Tradeoff:** `assets/quiz.js` trägt zwei Modi (Checkbox = Format 2.0,
+  Radio = Altmodus mit Sofort-Auswertung), damit die übrigen Lessons
+  unverändert laufen. Kein Framework (kein Alpine/Reveal) — Vanilla-JS im
+  zentralen Asset.
+
+## 2026-11-03: KM7-02-Erklärungsmodell + Schülerperspektive in den Skill (#22, opencode-helpers #123)
+
+- **Choice:** Die KM7-02-Lesson wurde an vier Stellen erklärend
+  nachgeschärft (Commit `4a5ae13`): Zellbeitrags-Zerlegung mit
+  aufgedröselter M3-Division, „alle sechs Zellen"-Präzisierung,
+  Merke-Callout, der „seltene Zellen zählen mehr" als Ursache der
+  Chi-Approximations-Warning benennt (Vorwärtsverweis auf Schritt 5 statt
+  Doppelung), und ein df-Abschnitt mit Frei/Fest-Gitter + Kalibrierungssatz.
+- **Why:** In der Überarbeitungs-Session fielen wiederkehrende
+  Erklärungslücken auf (Abkürzungen ohne Einführung, übersprungene
+  Rechenschritte, Warning unverbunden neben der Formel). Die Lehrperson
+  wünschte statt fachspezifischer Anweisungslisten eine allgemeine Regel:
+  Empathie mit dem Erstkontakt-Leser.
+- **Choice (Skill-Ebene):** Die Muster gingen verallgemeinert als Abschnitt
+  „Schülerperspektive (Erklärungsempathie)" in den `create-lesson`-Skill
+  (opencode-helpers #123, Commit `d93acb0`) — sparsam mit Fachjargon, nichts
+  Unerklärtes werfen, Warnings als Konsequenz eingeführter Konzepte,
+  Empathie vor Knappheit. Die sechs verworfenen Statistik-Spezialmuster
+  stehen dort nur als „Beispielhaft"-Zeile.
+- **Tradeoff:** Die Regel ist weicher als eine Checkliste und entzieht sich
+  mechanischer Verifikation — sie liegt beim LM-Urteil beim Bau/Nachziehen.
+
+## 2026-11-07: Quiz ohne Stufen und Modal, aufgabe.md, korrigierte Chi-Daten (#42)
+
+- **Choice:** Das Quiz-Format 2.0 wird **ohne** `data-stufe`,
+  `niveau`-Sterne und **ohne Show-Modal** weitergeführt (überschreibt die
+  entsprechenden Teile von #40). Der Titel steht als `Quiz: <thema-slug>`
+  im injizierten `h3`; Fragen sind `<fieldset>`/`<legend>`, ein
+  „Überprüfen"-Button je **Frage**, je **Option** eine Infokugel und eine
+  Entscheidungsfärbung, dazu eine versteckte `aria-live`-Statuszeile.
+  `name` ist lesson-präfixiert, `value` = DOM-Position.
+- **Why:** Stufen und Modal waren im Widget nie konsistent umgesetzt und
+  im Unterricht nicht gefordert; die Feldset-Semantik ist für
+  Screenreader die ehrliche Struktur, und der Klicktest bleibt einfach.
+- **Aufgaben-Datei:** `aufgabe.md` (nicht `Übungsbeispiele.md`) — deckt
+  sich mit AGENTS.md und der neuesten Lesson SA-04.
+- **Datenkorrektur:** 10,15 mm liegt bei ± 0,15 mm **in** Toleranz; der
+  ungerundete R-Vergleich zählt es wegen der Binärdarstellung fälschlich
+  als Ausschuss. Konsequent: 4 statt 6 Ausschussteile, KM7-02 X² 7,871 /
+  p 0,0195, Fisher 0,0335, Erwartungen 1,28/1,34/1,38. Gleiches gilt für
+  die M1-Schranke 9,92 mm (exakt auf der Schranke, R zählt sie als
+  Ausreißer).
+- **Tradeoff:** Historische Prüfungs- und Kohortendateien behalten die
+  alten 6er-Zahlen als Beleg; sie werden nicht rückdatiert. Der Nachweis
+  der neuen Werte steht in `KM6-01`/`KM7-02` und im Issue #42.

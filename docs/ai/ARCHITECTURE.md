@@ -1,6 +1,6 @@
 # Architecture
 
-Living structural map of the system as of 2026-09-29.
+Living structural map of the system as of 2026-10-29.
 Overwritten when structural changes occur during a session.
 
 ## Overview
@@ -13,8 +13,8 @@ GRG-PMM is a teaching repository for the subject Prozessmanagement (PMM, Maturaf
 |------|---------|
 | `lehrplan/` | Curriculum layer — **Fach-Ebene** (root): `METADATA.md` (legal basis, RIS refs, amendment history, class mapping), `RIS/` (RIS law-text PDFs only, ISO-date prefix), `kompetenzmodule/` (didactic KM-Steckbriefe km3–km9b), `ressourcen-matrix.md`, `r4ds-abdeckung.md` (KM-keyed resources) |
 | `lehrplan/pmm-hwit/` | Curriculum layer — **Zweig-Ebene**: `LEHRPLAN.md` (full extract JG1–JG5), `RIS.md` (legal status/amendments), `4HWIT/`+`5HWIT/` (class extracts), semester plans `jg{3,4,5}-semesterplan-{ws,ss}.md` (`jg3` = Vorwissen-/Selbststudiums-Planung) |
-| `unterricht/` | Teaching layer: prepared units **flat at root** as `<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul, `SA` = schulautonom; `<NN>` runs per KM) each with `praesentation.html` + `hausaufgabe.md` + `lesson.html`. **No Zweig-Fach folder** — plans live in `lehrplan/pmm-hwit/` |
-| `assets/` | **Single shared asset folder** (repo root): `lesson.css`, `style.css`, `slides.css`, `theme.js`, `quiz.js` (unified radio widget), `loader.js` (root resolver + injector), `site.js` (per-repo config: Pages base + badge label), `github-pages-link.js` (badge), `betriebsdaten.csv` |
+| `unterricht/` | Teaching layer: prepared units **flat at root** as `<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul, `SA` = schulautonom; `<NN>` runs per KM) each with `lesson.html` (= presentation, no separate deck), `aufgabe.md` (Beispiel 1–3), optional `daten/` subfolder for student downloads (#37); no day-README template since #40. **No Zweig-Fach folder** — plans live in `lehrplan/pmm-hwit/` |
+| `assets/` | **Single shared asset folder** (repo root): `lesson.css`, `style.css`, `theme.js`, `quiz.js` (Lernquiz Format 2.1 + Radio-Altmodus), `tables.js` (Tabellen-Querscroll, hüllt jede Tabelle in `.tabelle-scroll`), `loader.js` (root resolver + injector), `site.js` (per-repo config: Pages base + badge label), `github-pages-link.js` (badge), `betriebsdaten.csv` |
 | `4ahwit-x/`, `4ahwit-y/` | Root cohort folders (lowercase = cohort storage). Hub `README.md` + `MISSION/RESOURCES/NOTES.md`, `YYYY-MM-DD__thema/lesson.html` (dated lessons). Undated lessons are canonical under `unterricht/`; cohort `prepared-lessons/` dissolved 2026-09-28 (#20) |
 | `5ahwit/` | Root cohort folder in SWP pattern: hub-README + `teach/` (`MISSION/NOTES/RESOURCES`, `reference/`, `learning-records/`), `hausaufgaben/`, date folders; R-On-Ramp lessons referenced from `unterricht/SA-01…SA-03` |
 | `selbststudium/` | Self-study workspace (teach skill): `MISSION.md`, `RESOURCES.md`, `NOTES.md`, `prepared-lessons/` (two-digit), `reference/` (glossar, jg3-/km7-verlaufsmap, r-setup), `learning-records/` |
@@ -23,12 +23,14 @@ GRG-PMM is a teaching repository for the subject Prozessmanagement (PMM, Maturaf
 | `.nojekyll` | Bypass Jekyll on GitHub Pages |
 | `docs/ai/` | Structured knowledge files for AI agent persistence |
 | `Unterlagen/` | Teaching reference materials and scripts |
+| `Projekte/` | Long-running projects, one folder per project; data-project scheme per `fragestellungen-statistik/` (#36): one file per KM (`km7.md`, `km9a.md`), cross-cutting theme files (`klima-klimawandel.md`, `corona-impfmythen.md`, `datensaetze-im-widerspruch.md`, `kuriose-quellen.md`) + curated `daten/<name>.csv` with `<name>.md` metadata (source, license, R read-check) + `daten/_index/datasets.csv` (Rdatasets catalog as search tool) + `daten/_build/build_data*.R` (deterministic build scripts); single deep-dive source files sit directly in `Projekte/` (`femizid-taeter-nationalitaet.md`) |
+| `Projekte/boku/` | Database project for the school Postgres (`clx`, BOKU fish survey, read-only): `psqlx` (psql wrapper sourcing `.env` with `PG*` vars, forces `default_transaction_read_only`, never prints the password), `.env` (credentials, mode 600, gitignored), `joins.md` (ER graph, 3 FKs, verified queries, data-quality pitfalls), `README.md`; R artefacts `.RData`/`.Rhistory` remain local |
 | *(kein `.opencode/`)* | Skills live in `opencode-helpers/skills/`, symlinked via `~/.config/opencode/skills` |
 
 ## HTML Page Anatomy (all pages)
 
 1. Generic inline bootstrap in `<head>` (walks ancestor dirs, probes `assets/loader.js`; no repo name).
-2. `assets/loader.js` resolves the root from its own URL, injects `data-css`/`data-js`, plus `site.js` and `github-pages-link.js`.
+2. `assets/loader.js` resolves the root from its own URL, injects `data-css`/`data-js`, plus `site.js`, `tables.js` (Tabellen-Querscroll) and `github-pages-link.js`.
 3. Badge „Auf GitHub Pages ansehen" (fixed, `no-print`).
 4. All **non-asset** links stay relative; no `<base>`.
 
